@@ -1,0 +1,318 @@
+/* Boot screen, 3D stage, HUD. The room is always dark, whatever the OS theme. */
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  background: #12110f;
+  color: #e9e2d4;
+}
+
+/* ---- boot ---------------------------------------------------------------- */
+
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: #0e0d0c;
+  transition: opacity 0.7s ease;
+}
+
+.boot.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boot-inner {
+  width: min(460px, 88vw);
+  padding: 24px;
+}
+
+.boot-title {
+  margin: 0 0 20px;
+  font-family: var(--font-pixel);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.boot-log {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  min-height: 9em;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #bdb5a4;
+}
+
+.boot-status {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #e9e2d4;
+}
+
+.boot-progress {
+  height: 8px;
+  border: 1px solid #e9e2d4;
+  overflow: hidden;
+}
+
+.boot-progress span {
+  display: block;
+  height: 100%;
+  background: var(--lamp);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.35s ease;
+}
+
+.boot-skip {
+  margin-top: 18px;
+  font: inherit;
+  font-size: 13px;
+  color: #e9e2d4;
+  background: none;
+  border: 1px solid #6d665b;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.boot-skip:hover:not(:disabled) {
+  border-color: var(--lamp);
+}
+
+.boot-skip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- stages -------------------------------------------------------------- */
+
+.room-stage {
+  position: fixed;
+  inset: 0;
+  background: #12110f;
+}
+
+.room-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The CSS 3D layer sits on top of the canvas and ignores the pointer,
+   so clicks reach the canvas (the monitor and the lamp are picked there). */
+.css-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* While the room is in wide view or moving, the screen ignores the pointer.
+   Only a zoomed-in screen takes input. */
+body[data-zoom="wide"] .os,
+body[data-zoom="moving"] .os {
+  pointer-events: none !important;
+}
+
+body[data-zoom="zoomed"] .os {
+  pointer-events: auto !important;
+}
+
+/* ---- HUD ----------------------------------------------------------------- */
+
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+.hud-brand {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  color: #e9e2d4;
+}
+
+.hud-hint {
+  position: absolute;
+  top: 40px;
+  left: 16px;
+  max-width: 38ch;
+  margin: 0;
+  font-size: 12px;
+  color: #a39b8d;
+}
+
+#sound-toggle {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+}
+
+.hud-tools {
+  position: absolute;
+  left: 16px;
+  bottom: 44px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hud-back {
+  position: absolute;
+  left: 16px;
+  bottom: 44px;
+}
+
+.hud-btn {
+  font: inherit;
+  font-size: 13px;
+  color: #efe9dc;
+  background: rgba(20, 18, 16, 0.72);
+  border: 1px solid rgba(233, 226, 212, 0.28);
+  border-radius: 2px;
+  padding: 7px 12px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.hud-btn:hover:not(:disabled) {
+  border-color: var(--lamp);
+}
+
+.hud-btn[aria-pressed="true"] {
+  border-color: var(--lamp);
+}
+
+.hud-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.hud-btn:focus-visible {
+  outline-color: var(--lamp);
+}
+
+.site-links {
+  position: fixed;
+  right: 16px;
+  bottom: 12px;
+  z-index: 50;
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: #a39b8d;
+}
+
+.site-links a {
+  color: #d9d2c3;
+}
+
+body[data-mode="boot"] .hud,
+body[data-mode="boot"] .site-links {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hud,
+.site-links {
+  transition: opacity 0.6s ease;
+}
+
+/* ---- skip link ----------------------------------------------------------- */
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 6px 10px;
+  background: #f4efe4;
+  color: #1d1b18;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* ---- fallback (phones, no WebGL, reduced motion) ------------------------- */
+
+.fallback-host {
+  position: fixed;
+  inset: 0;
+  display: none;
+}
+
+body[data-mode="os"] .fallback-host {
+  display: block;
+}
+
+body[data-mode="os"] .room-stage,
+body[data-mode="os"] .css-stage,
+body[data-mode="os"] .hud-tools,
+body[data-mode="os"] .hud-hint,
+body[data-mode="os"] .hud-brand,
+body[data-mode="os"] #btn-back {
+  display: none;
+}
+
+body[data-mode="os"] .site-links {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  background: #efe9dc;
+  color: #6d665b;
+  border-top: 2px solid #1d1b18;
+  font-family: var(--font-body);
+}
+
+body[data-mode="os"] .site-links a {
+  color: #1d1b18;
+}
+
+body[data-mode="os"] .site-links span {
+  display: none;
+}
+
+body[data-mode="os"] #sound-toggle {
+  top: 3px;
+  right: 8px;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.fallback-error {
+  position: absolute;
+  left: 16px;
+  bottom: 48px;
+  margin: 0;
+  color: #1d1b18;
+  background: #f2d35c;
+  padding: 6px 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot,
+  .hud,
+  .site-links,
+  .boot-progress span {
+    transition: none;
+  }
+}

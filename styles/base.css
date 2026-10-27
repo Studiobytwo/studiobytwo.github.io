@@ -1,0 +1,103 @@
+/* Shared tokens and fonts. Loaded by every page. Fonts are self-hosted (no CDN). */
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/vendor/fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url("/vendor/fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/vendor/fonts/silkscreen-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Silkscreen";
+  src: url("/vendor/fonts/silkscreen-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink: #1d1b18;
+  --paper: #ede7db;
+  --paper-deep: #ddd5c6;
+  --muted: #6d665b;
+  --lamp: #e8934a;
+  --glow: #8fb3e6;
+  --focus: #e8934a;
+  --font-body: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --font-pixel: "Silkscreen", "IBM Plex Mono", monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #ece6da;
+    --paper: #171614;
+    --paper-deep: #242220;
+    --muted: #a39b8d;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #ece6da;
+  --paper: #171614;
+  --paper-deep: #242220;
+  --muted: #a39b8d;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.ph {
+  background: #f2d35c;
+  color: #1d1b18;
+  padding: 0 0.25em;
+  border: 1px dashed #1d1b18;
+}

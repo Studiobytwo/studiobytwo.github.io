@@ -1,0 +1,30 @@
+[
+  {
+    "slug": "placeholder-desk-lamp",
+    "title": "Desk Lamp Study (Placeholder)",
+    "year": "2026",
+    "category": "Lighting",
+    "cover": "01.webp"
+  },
+  {
+    "slug": "placeholder-vessel-series",
+    "title": "Vessel Series (Placeholder)",
+    "year": "2025",
+    "category": "Objects",
+    "cover": "01.webp"
+  },
+  {
+    "slug": "placeholder-stool-prototype",
+    "title": "Stool Prototype (Placeholder)",
+    "year": "2025",
+    "category": "Furniture",
+    "cover": "01.webp"
+  },
+  {
+    "slug": "placeholder-wall-object",
+    "title": "Wall Object (Placeholder)",
+    "year": "2024",
+    "category": "Installation",
+    "cover": "01.webp"
+  }
+]

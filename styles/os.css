@@ -1,0 +1,459 @@
+/* StudioOS: the retro desktop. Fixed 1280 x 800 on the monitor in the room
+   (CSS 3D scales it), full screen in fallback mode. Always light, like a
+   small paper-and-ink machine. */
+
+.os {
+  --os-paper: #f4efe4;
+  --os-paper-2: #efe9dc;
+  --os-ink: #1d1b18;
+  --os-muted: #6d665b;
+  --os-lamp: #e8934a;
+  --os-yellow: #f2d35c;
+
+  position: relative;
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--os-ink);
+  background-color: #26394f;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 28% 22%, #3e5a78 0%, #22344a 55%, #151f2c 100%);
+  background-size: 4px 4px, 100% 100%;
+  text-align: left;
+  -webkit-font-smoothing: auto;
+}
+
+.os *,
+.os *::before,
+.os *::after {
+  box-sizing: border-box;
+}
+
+.os:focus {
+  outline: none;
+}
+
+.os-fullscreen {
+  width: 100vw;
+  height: calc(100dvh - 34px);
+}
+
+/* ---- menubar ------------------------------------------------------------- */
+
+.os-menubar {
+  position: relative;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  padding: 0 150px 0 12px;
+  background: var(--os-paper-2);
+  border-bottom: 2px solid var(--os-ink);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+}
+
+.os-brand {
+  letter-spacing: 0.04em;
+}
+
+.os-clock {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- desktop and icons --------------------------------------------------- */
+
+.os-desktop {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.os-icons {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.os-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 96px;
+  padding: 8px 4px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: #f4efe4;
+  background: none;
+  border: 1px dotted transparent;
+  cursor: pointer;
+}
+
+.os-icon-art svg {
+  display: block;
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
+}
+
+.os-icon-label {
+  padding: 1px 4px;
+}
+
+.os-icon.is-selected {
+  border-color: var(--os-lamp);
+  background: rgba(232, 147, 74, 0.25);
+}
+
+.os-icon.is-selected .os-icon-label {
+  background: var(--os-ink);
+}
+
+.os-icon:focus-visible {
+  outline: 2px solid var(--os-lamp);
+  outline-offset: 2px;
+}
+
+/* ---- windows ------------------------------------------------------------- */
+
+.os-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  max-height: calc(100% - 16px);
+  background: var(--os-paper);
+  border: 2px solid var(--os-ink);
+  box-shadow: 6px 6px 0 rgba(10, 10, 10, 0.55);
+  outline: none;
+  animation: os-open 0.14s ease-out;
+}
+
+.os-window:not(.is-active) {
+  box-shadow: 4px 4px 0 rgba(10, 10, 10, 0.35);
+}
+
+.os-window:not(.is-active) .os-titlebar {
+  opacity: 0.7;
+}
+
+@keyframes os-open {
+  from {
+    transform: scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.os-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 6px;
+  background: repeating-linear-gradient(0deg, var(--os-ink) 0 1px, var(--os-paper) 1px 3px);
+  border-bottom: 2px solid var(--os-ink);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.os-window.is-dragging .os-titlebar {
+  cursor: grabbing;
+}
+
+.os-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: var(--os-paper);
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+}
+
+.os-close {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font: 16px/16px var(--font-body);
+  color: var(--os-ink);
+  background: var(--os-paper);
+  border: 1px solid var(--os-ink);
+  cursor: pointer;
+}
+
+.os-close:hover {
+  background: var(--os-yellow);
+}
+
+.os-close:focus-visible,
+.os-btn:focus-visible,
+.os-row:focus-visible,
+.os-thumb:focus-visible {
+  outline: 2px solid var(--os-lamp);
+  outline-offset: 2px;
+}
+
+.os-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 18px 18px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.os-status {
+  margin: 0;
+  color: var(--os-muted);
+}
+
+.os-meta {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--os-muted);
+}
+
+.os-text p,
+.os-article p {
+  margin: 0 0 0.9em;
+  max-width: 64ch;
+}
+
+/* ---- projects list ------------------------------------------------------- */
+
+.os-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.os-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--os-ink);
+  background: #fffaf0;
+  border: 1px solid var(--os-ink);
+  cursor: pointer;
+}
+
+.os-row:hover {
+  background: var(--os-yellow);
+}
+
+.os-thumb-img {
+  flex: 0 0 auto;
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border: 1px solid var(--os-ink);
+  background: #ddd5c6;
+}
+
+.os-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.os-row-text strong {
+  font-weight: 600;
+}
+
+/* ---- project and gallery ------------------------------------------------- */
+
+.os-stage {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--os-ink);
+  border: 1px solid var(--os-ink);
+}
+
+.os-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.os-gallery:focus-visible {
+  outline: 2px solid var(--os-lamp);
+  outline-offset: 2px;
+}
+
+.os-gallery {
+  margin: 0 0 12px;
+  padding: 0;
+}
+
+.os-gallery-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.os-count {
+  font-size: 12px;
+  color: var(--os-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.os-btn {
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  color: var(--os-ink);
+  background: var(--os-paper);
+  border: 1px solid var(--os-ink);
+  cursor: pointer;
+}
+
+.os-btn:hover {
+  background: var(--os-yellow);
+}
+
+.os-thumbs {
+  display: flex;
+  gap: 6px;
+  padding: 2px 0 6px;
+  overflow-x: auto;
+}
+
+.os-thumb {
+  flex: 0 0 auto;
+  padding: 0;
+  background: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.os-thumb[aria-current="true"] {
+  border-color: var(--os-lamp);
+}
+
+.os-thumb img {
+  display: block;
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+}
+
+/* ---- legal pages inside windows ------------------------------------------ */
+
+.os-doc h2 {
+  margin: 1.1em 0 0.4em;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.os-doc p {
+  margin: 0 0 0.8em;
+}
+
+.os-doc a {
+  color: var(--os-ink);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.os-doc .legal-note {
+  color: var(--os-muted);
+  font-size: 12px;
+}
+
+.os-doc .ph {
+  background: var(--os-yellow);
+  color: var(--os-ink);
+  padding: 0 0.25em;
+  border: 1px dashed var(--os-ink);
+}
+
+/* ---- phones and full-screen fallback ------------------------------------- */
+
+.os-fullscreen .os-icons {
+  top: 14px;
+  right: 14px;
+  left: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+.os-fullscreen .os-desktop {
+  top: 26px;
+}
+
+@media (max-width: 767px) {
+  .os-fullscreen .os-icons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .os-menubar {
+    padding-right: 110px;
+  }
+
+  /* Windows become full-screen sheets on phones; dragging is off. */
+  .os-window {
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100%;
+    max-height: none;
+    box-shadow: none;
+    border-width: 0;
+  }
+
+  .os-titlebar {
+    cursor: default;
+  }
+
+  .os-body {
+    padding: 14px 16px 28px;
+  }
+
+  .os-thumb-img {
+    width: 96px;
+    height: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-window {
+    animation: none;
+  }
+}

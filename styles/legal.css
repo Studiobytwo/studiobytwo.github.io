@@ -1,0 +1,89 @@
+/* Standalone legal pages (/impressum/, /datenschutz/). Plain, readable, no JS needed. */
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.legal-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--paper-deep);
+}
+
+.legal-brand {
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.legal-head nav {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.legal-head a {
+  color: var(--ink);
+}
+
+.legal-head a[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal {
+  flex: 1;
+  width: min(68ch, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 48px;
+}
+
+.legal h1 {
+  margin: 0 0 24px;
+  font-family: var(--font-pixel);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.legal h2 {
+  margin: 28px 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.legal p {
+  margin: 0 0 14px;
+}
+
+.legal a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+
+.legal-note {
+  margin-top: 32px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legal-foot {
+  padding: 16px 24px 24px;
+  font-size: 14px;
+}
+
+.legal-foot a {
+  color: var(--ink);
+}

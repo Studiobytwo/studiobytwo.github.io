@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Studio by Two · Objects and lamps</title>
+  <meta name="description" content="Studio by Two is the design studio of Arian Bayati and Paniz Nikkhah. We design objects and lamps.">
+  <meta name="robots" content="index, follow">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#1d1b18">
+  <link rel="canonical" href="https://studiobytwo.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Studio by Two">
+  <meta property="og:title" content="Studio by Two · Objects and lamps">
+  <meta property="og:description" content="The design studio of Arian Bayati and Paniz Nikkhah. Objects and lamps.">
+  <meta property="og:url" content="https://studiobytwo.github.io/">
+  <meta property="og:image" content="https://studiobytwo.github.io/assets/og-image.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Studio by Two · Objects and lamps">
+  <meta name="twitter:description" content="The design studio of Arian Bayati and Paniz Nikkhah. Objects and lamps.">
+  <meta name="twitter:image" content="https://studiobytwo.github.io/assets/og-image.webp">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/room.css">
+  <link rel="stylesheet" href="/styles/os.css">
+  <noscript>
+    <style>
+      #boot, #room-stage, #css-stage, #fallback-host, .hud { display: none !important; }
+      .nojs { display: block; }
+    </style>
+  </noscript>
+  <script type="importmap">
+    { "imports": { "three": "/vendor/three/three.module.min.js" } }
+  </script>
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body data-mode="boot" data-zoom="wide">
+  <a class="skip-link" href="#site-links">Skip to links</a>
+
+  <!-- Loading screen. Progress is driven by real loading steps (see js/main.js). -->
+  <section id="boot" class="boot" aria-label="Loading Studio by Two">
+    <div class="boot-inner">
+      <p class="boot-title">Studio by Two</p>
+      <ul id="boot-log" class="boot-log" aria-live="polite"></ul>
+      <p id="boot-status" class="boot-status">Starting…</p>
+      <div class="boot-progress" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span id="boot-bar"></span>
+      </div>
+      <button id="boot-skip" class="boot-skip" type="button">Skip</button>
+    </div>
+  </section>
+
+  <!-- The 3D room (canvas) and the StudioOS screen (CSS 3D layer on top). -->
+  <div id="room-stage" class="room-stage"></div>
+  <div id="css-stage" class="css-stage"></div>
+
+  <!-- Fallback: phones, no WebGL, or reduced motion. StudioOS fills the screen. -->
+  <div id="fallback-host" class="fallback-host"></div>
+
+  <div class="hud">
+    <p class="hud-brand">Studio by Two</p>
+    <button id="sound-toggle" class="hud-btn" type="button" aria-pressed="false">Sound: off</button>
+    <div class="hud-tools">
+      <button id="btn-lamp" class="hud-btn" type="button" aria-pressed="true">Switch lamp off</button>
+      <button id="btn-monitor" class="hud-btn" type="button">Zoom to screen</button>
+    </div>
+    <button id="btn-back" class="hud-btn hud-back" type="button" hidden>← Back to room</button>
+    <p id="hint" class="hud-hint">Click the monitor to step in. Click the lamp to switch it.</p>
+  </div>
+
+  <footer id="site-links" class="site-links">
+    <span>Studio by Two</span>
+    <a href="/impressum/">Impressum</a>
+    <a href="/datenschutz/">Datenschutz</a>
+  </footer>
+
+  <noscript>
+    <main class="nojs" id="main">
+      <h1>Studio by Two</h1>
+      <p>Studio by Two is the design studio of Arian Bayati and Paniz Nikkhah. We design objects and lamps.</p>
+
+      <h2>Projects</h2>
+      <ul>
+        <li>Desk Lamp Study (Placeholder), 2026, Lighting</li>
+        <li>Vessel Series (Placeholder), 2025, Objects</li>
+        <li>Stool Prototype (Placeholder), 2025, Furniture</li>
+        <li>Wall Object (Placeholder), 2024, Installation</li>
+      </ul>
+
+      <h2>About</h2>
+      <p>We studied at HFBK Hamburg (Hochschule für bildende Künste). Our work starts at the desk, with small things that are used every day.</p>
+
+      <h2>Contact</h2>
+      <p>E-mail: <span class="ph">[PLACEHOLDER: studio e-mail]</span></p>
+
+      <p><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
+    </main>
+  </noscript>
+</body>
+</html>
