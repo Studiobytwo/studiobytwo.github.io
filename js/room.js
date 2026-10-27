@@ -12,8 +12,8 @@ const WIDE = {
   look: new THREE.Vector3(-0.12, 0.98, -0.12),
 };
 const ZOOM_MS = 1600;
-const LAMP_ON = { spot: 9, bulb: 3.2, hemi: 0.34 };
-const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1 };
+const LAMP_ON = { spot: 9, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
+const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
 
 const UP_NEG = new THREE.Vector3(0, -1, 0);
 
@@ -299,6 +299,11 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   lampLight.shadow.camera.far = 3;
   room.add(lampLight);
 
+  // Soft warm bounce from the lamp, so the wall, shelf and poster read when it is on.
+  const bounce = new THREE.PointLight(0xffb070, 0, 4, 1.6);
+  bounce.position.set(head.x + 0.2, head.y + 0.25, head.z - 0.2);
+  room.add(bounce);
+
   // ---- lights --------------------------------------------------------------
   const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);
   scene.add(hemi);
@@ -463,6 +468,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     mat.shade.emissiveIntensity = 0.12 * L;
     mat.bulb.color.setRGB(0.25 + 0.75 * L, 0.2 + 0.6 * L, 0.1 + 0.3 * L);
     hemi.intensity = LAMP_OFF.hemi + (LAMP_ON.hemi - LAMP_OFF.hemi) * L;
+    bounce.intensity = LAMP_ON.bounce * L;
     monitorLight.intensity = 0.12 + 0.12 * (1 - L);
 
     renderer.render(scene, camera);

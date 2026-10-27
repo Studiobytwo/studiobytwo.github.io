@@ -113,13 +113,18 @@ body {
 
 /* While the room is in wide view or moving, the screen ignores the pointer.
    Only a zoomed-in screen takes input. */
-body[data-zoom="wide"] .os,
-body[data-zoom="moving"] .os {
+body[data-mode="room"][data-zoom="wide"] .os,
+body[data-mode="room"][data-zoom="moving"] .os {
   pointer-events: none !important;
 }
 
-body[data-zoom="zoomed"] .os {
+body[data-mode="room"][data-zoom="zoomed"] .os {
   pointer-events: auto !important;
+}
+
+/* Zoomed in, the screen fills the view; the hint would sit on top of it. */
+body[data-zoom="zoomed"] .hud-hint {
+  display: none;
 }
 
 /* ---- HUD ----------------------------------------------------------------- */
