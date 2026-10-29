@@ -135,7 +135,7 @@
   display: flex;
   flex-direction: column;
   min-width: 240px;
-  max-height: calc(100% - 16px);
+  max-height: calc(100% - 52px);
   background: var(--os-paper);
   border: 2px solid var(--os-ink);
   box-shadow: 6px 6px 0 rgba(10, 10, 10, 0.55);
@@ -242,6 +242,12 @@
 .os-article p {
   margin: 0 0 0.9em;
   max-width: 64ch;
+  overflow-wrap: anywhere;
+}
+
+.os-text a {
+  color: var(--os-ink);
+  text-underline-offset: 2px;
 }
 
 /* ---- projects list ------------------------------------------------------- */
@@ -252,6 +258,18 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.os-group h3 {
+  margin: 10px 0 0;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--os-muted);
+}
+
+.os-group:first-child h3 {
+  margin-top: 0;
 }
 
 .os-row {
@@ -295,14 +313,16 @@
 /* ---- project and gallery ------------------------------------------------- */
 
 .os-stage {
-  display: grid;
-  place-items: center;
+  position: relative;
   aspect-ratio: 4 / 3;
   background: var(--os-ink);
   border: 1px solid var(--os-ink);
 }
 
+/* Absolutely placed so a tall photo cannot stretch the 4:3 stage. */
 .os-photo {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;

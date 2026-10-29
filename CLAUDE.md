@@ -63,10 +63,14 @@ Each project is a folder under `content/` plus one line in `content/projects.jso
 4. Add an entry to `content/projects.json`:
 
    ```json
-   { "slug": "lamp-no-2", "title": "Lamp No. 2", "year": "2026", "category": "Lighting", "cover": "01.webp" }
+   { "slug": "lamp-no-2", "title": "Lamp No. 2", "year": "2026", "category": "Lighting", "cover": "01.webp", "group": "Arian Bayati & Paniz Nikkhah" }
    ```
 
    `cover` is the file shown in the Projects list. Keep `title`, `year` and `category` identical to `project.md`.
+   `year` is optional: leave it out (in both files) when it is not known.
+   `group` puts the project under a heading in the Projects list. Two groups are in use:
+   `Arian Bayati & Paniz Nikkhah` (studio work, listed first) and `Arian Bayati` (individual work).
+   Keep projects of the same group next to each other in the file.
 5. Add the project to the `<noscript>` list in `index.html`, so visitors without JavaScript see it too.
 
 ### Edit a project
@@ -80,9 +84,11 @@ Delete the entry from `content/projects.json`, delete the folder `content/<slug>
 Change the order of the entries in `content/projects.json`. The Projects window lists them in that order.
 The order of images is the order of the `images:` list in `project.md`.
 
-### Placeholders
-The four projects that ship with the repo are named "(Placeholder)" and use generated images.
-Replace them, or delete them, when real material is ready.
+### Where the current content came from
+- The Refusal: photo and exhibition text supplied by the studio, render from the portfolio PDF.
+- Reallabor Zekiwa Zeitz: text and photos from the project's page on hfbk-hamburg.de (German original kept below the English translation).
+- All other projects: text and images extracted from Arian Bayati's portfolio PDF. "Mars 2112" is left out on purpose.
+- The ByTwo logo on the room wall is `assets/bytwo-logo.webp`; it is loaded in `js/room.js`.
 
 ## Content: text and contact
 

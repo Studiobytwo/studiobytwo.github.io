@@ -15,9 +15,11 @@
 
 ## Images
 
-- The images in `content/placeholder-*/` are generated placeholders, created for this repository. They are not photographs of real work and will be replaced.
+- Project images are the studio's own work (Arian Bayati, Paniz Nikkhah), taken from Arian Bayati's portfolio and from the studio's own photos.
+- The images of Reallabor Zekiwa Zeitz come from the project's page on hfbk-hamburg.de (HFBK Hamburg, Design Department).
+- `assets/bytwo-logo.webp` is the studio's logo.
 
 ## Own assets
 
-- `assets/favicon.svg` and `assets/og-image.webp` were created for this site.
+- `assets/favicon.svg` was created for this site. `assets/og-image.webp` is made from the studio's logo.
 - Sounds are synthesized in the browser (`js/sound.js`). No sound files are used.

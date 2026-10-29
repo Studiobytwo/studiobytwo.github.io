@@ -46,34 +46,6 @@ function makeWoodTexture() {
   return tex;
 }
 
-function makePosterTexture() {
-  const c = document.createElement('canvas');
-  c.width = 512;
-  c.height = 720;
-  const g = c.getContext('2d');
-  g.fillStyle = '#e9e1d1';
-  g.fillRect(0, 0, 512, 720);
-  g.fillStyle = '#1d1b18';
-  g.beginPath();
-  g.arc(256, 300, 120, Math.PI * 1.05, Math.PI * 1.95);
-  g.lineTo(330, 470);
-  g.lineTo(182, 470);
-  g.closePath();
-  g.fill();
-  g.fillRect(250, 470, 12, 110);
-  g.fillStyle = '#e8934a';
-  g.beginPath();
-  g.arc(256, 300, 26, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = '#1d1b18';
-  g.font = '34px Silkscreen, monospace';
-  g.textAlign = 'center';
-  g.fillText('STUDIO BY TWO', 256, 650);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
 // Places a thin cylinder between two points (used for the lamp arms).
 function limb(from, to, radius, material) {
   const dir = new THREE.Vector3().subVectors(to, from);
@@ -148,13 +120,16 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   side.rotation.y = Math.PI / 2;
   room.add(side);
 
-  // Poster on the back wall.
-  const poster = place(
-    new THREE.Mesh(new THREE.PlaneGeometry(0.46, 0.65), new THREE.MeshStandardMaterial({ map: makePosterTexture(), roughness: 0.8 })),
-    -0.95, 1.5, -0.7,
+  // The ByTwo logo, framed, on the back wall.
+  const logoTex = new THREE.TextureLoader().load('/assets/bytwo-logo.webp');
+  logoTex.colorSpace = THREE.SRGBColorSpace;
+  logoTex.anisotropy = 4;
+  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, 0.02), mat.beige), -0.95, 1.44, -0.71, { cast: false }));
+  room.add(place(
+    new THREE.Mesh(new THREE.PlaneGeometry(0.56, 0.56), new THREE.MeshStandardMaterial({ map: logoTex, roughness: 0.6 })),
+    -0.95, 1.44, -0.6985,
     { cast: false }
-  );
-  room.add(poster);
+  ));
 
   // ---- desk ----------------------------------------------------------------
   const deskTop = place(new THREE.Mesh(new RoundedBoxGeometry(1.7, 0.04, 0.8, 3, 0.012), mat.wood), 0, 0.74, 0);

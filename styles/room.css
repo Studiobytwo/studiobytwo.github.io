@@ -123,7 +123,9 @@ body[data-mode="room"][data-zoom="zoomed"] .os {
 }
 
 /* Zoomed in, the screen fills the view; the hint would sit on top of it. */
-body[data-zoom="zoomed"] .hud-hint {
+body[data-zoom="zoomed"] .hud-hint,
+body[data-zoom="zoomed"] .hud-brand,
+body[data-zoom="zoomed"] .hud-tools {
   display: none;
 }
 

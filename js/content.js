@@ -58,16 +58,22 @@ export function parseDoc(source) {
   return { meta, images: meta.images || [], paragraphs };
 }
 
-const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
+const LINK = /https?:\/\/[^\s]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+/;
 
-// Writes text into `parent`, turning e-mail addresses into mailto links.
+// Writes text into `parent`, turning web addresses and e-mail addresses into links.
 function appendText(parent, text) {
   let rest = text;
   let m;
-  while ((m = rest.match(EMAIL))) {
+  while ((m = rest.match(LINK))) {
     parent.append(rest.slice(0, m.index));
     const a = document.createElement('a');
-    a.href = `mailto:${m[0]}`;
+    if (m[0].startsWith('http')) {
+      a.href = m[0];
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    } else {
+      a.href = `mailto:${m[0]}`;
+    }
     a.textContent = m[0];
     parent.append(a);
     rest = rest.slice(m.index + m[0].length);

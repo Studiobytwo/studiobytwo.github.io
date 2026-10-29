@@ -1,5 +1,5 @@
-Studio by Two is the design studio of Arian Bayati and Paniz Nikkhah.
+Studio by Two is the design studio of Arian Bayati and Paniz Nikkhah. We design objects and lamps.
 
-We design objects and lamps. Our work starts at the desk, with small things that are used every day: a lamp that is switched on at night, a vessel that holds water, a stool that is sat on by someone we will never meet.
+We both study design at HFBK Hamburg (Hochschule für bildende Künste). Our shared work moves between lighting, material research and product design: a corner lamp that refuses the centre of the room, hemp blocks traced from raw material to window, a mirrored table in reverse wood, a pizza oven built panel by panel.
 
-We studied at HFBK Hamburg (Hochschule für bildende Künste). This text is placeholder copy and will be replaced with the studio's own words.
+Arian also works in 3D design, architecture concepts, graphic and UI design, and video, using Rhino, Blender, AutoCAD, Illustrator, Photoshop, InDesign, Figma, Canva, Premiere Pro and DaVinci Resolve.

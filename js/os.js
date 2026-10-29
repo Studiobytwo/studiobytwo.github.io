@@ -11,7 +11,7 @@ const ICON_SVG = {
   contact:
     '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="7.5" width="26" height="17" fill="#f4efe4" stroke="#1d1b18" stroke-width="1.5"/><path d="M3.5 8.5 16 18.5l12.5-10" fill="none" stroke="#1d1b18" stroke-width="1.5"/></svg>',
   impressum:
-    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 3.5h12.5L25 9v19.5H7z" fill="#f4efe4" stroke="#1d1b18" stroke-width="1.5" stroke-linejoin="round"/><text x="16" y="24" text-anchor="middle" font-family="Silkscreen, monospace" font-size="12" fill="#1d1b18">§</text></svg>',
+    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 3.5h12.5L25 9v19.5H7z" fill="#f4efe4" stroke="#1d1b18" stroke-width="1.5" stroke-linejoin="round"/><text x="16" y="25" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="17" font-weight="600" fill="#1d1b18">§</text></svg>',
   datenschutz:
     '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="14" width="18" height="13" fill="#8fb3e6" stroke="#1d1b18" stroke-width="1.5"/><path d="M11 14v-4a5 5 0 0 1 10 0v4" fill="none" stroke="#1d1b18" stroke-width="1.5"/><circle cx="16" cy="20" r="1.8" fill="#1d1b18"/></svg>',
 };
@@ -179,6 +179,7 @@ export function createOS({ sound }) {
     state.cascade += 1;
     win.style.left = `${150 + offset}px`;
     win.style.top = `${36 + offset}px`;
+    win.style.maxHeight = `calc(100% - ${52 + offset}px)`;
     if (width) win.style.width = width;
 
     const rec = { id, el: win, body, opener: document.activeElement };
@@ -220,7 +221,14 @@ export function createOS({ sound }) {
       return;
     }
     const list = el('ul', 'os-list');
+    let group = null;
     for (const p of state.projects) {
+      if (p.group && p.group !== group) {
+        group = p.group;
+        const heading = el('li', 'os-group');
+        heading.append(el('h3', '', group));
+        list.append(heading);
+      }
       const item = el('li');
       const button = el('button', 'os-row');
       button.type = 'button';
@@ -232,7 +240,7 @@ export function createOS({ sound }) {
       thumb.loading = 'lazy';
       thumb.decoding = 'async';
       const text = el('span', 'os-row-text');
-      text.append(el('strong', '', p.title), el('span', 'os-meta', `${p.year} · ${p.category}`));
+      text.append(el('strong', '', p.title), el('span', 'os-meta', [p.year, p.category].filter(Boolean).join(' · ')));
       button.append(thumb, text);
       button.addEventListener('click', () => openProject(p));
       item.append(button);
