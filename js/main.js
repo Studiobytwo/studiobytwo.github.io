@@ -112,8 +112,10 @@ async function runBoot() {
       screenEl: os.root,
       onZoomChange: handleZoomChange,
       onLampChange: handleLampChange,
+      onDimmerChange: handleDimmerChange,
     })
   );
+  room.setDimmer(Number(dimmer.value) / 100);
   handleZoomChange('wide');
   await step('Renderer', 25, () => room.compile());
   setProgress(100);
@@ -149,7 +151,7 @@ function handleZoomChange(mode) {
   hint.textContent =
     mode === 'zoomed'
       ? 'Press Escape or use the button to return to the room.'
-      : 'Click the monitor to step in. Click the lamp to switch it.';
+      : 'Click the monitor to step in. Click a lamp to switch it. Dim The Refusal with the slider.';
   if (mode === 'zoomed') {
     os.root.querySelector('.os-icon')?.focus({ preventScroll: true });
   }
@@ -160,6 +162,18 @@ function handleLampChange(on) {
   btnLamp.textContent = on ? 'Switch lamp off' : 'Switch lamp on';
   sound.play('lamp');
 }
+
+// The Refusal's dimmer. The slider drives the room; clicking the lamp in 3D
+// switches it off or back on, and the slider follows.
+const dimmer = $('#dimmer');
+const dimmerValue = $('#dimmer-value');
+function handleDimmerChange(level) {
+  const percent = Math.round(level * 100);
+  dimmer.value = String(percent);
+  dimmer.setAttribute('aria-valuetext', `${percent} percent`);
+  dimmerValue.textContent = `${percent}%`;
+}
+dimmer.addEventListener('input', () => room?.setDimmer(Number(dimmer.value) / 100));
 
 btnLamp.addEventListener('click', () => room?.toggleLamp());
 btnMonitor.addEventListener('click', () => room?.zoomIn());

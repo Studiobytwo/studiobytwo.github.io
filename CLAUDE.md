@@ -103,6 +103,11 @@ Each object in `js/room.js` is built from primitives and procedural materials, a
 - `room` holds the walls, floor, desk and objects on the desk and shelf.
 - `monitor` is the retro computer. Its front is the `hit` plane, which is the click target for the screen.
 - `lamp` is the desk lamp. Its group has `userData.action = 'lamp'`, which makes it clickable.
+- `refusal` is a model of The Refusal on the wall beside the monitor: red box, three arms, three globes, cable.
+  Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
+  clicking the lamp in 3D switches it off or back to its last level). Brightness at 100% is `REFUSAL_MAX`.
+- `photoFrame` is the framed photo on the desk (`assets/photo-arian-paniz.webp`). Replace that file to change the photo; keep it 3:4 portrait.
+- `WIDE` at the top of `js/room.js` is the starting camera position. Move `pos` further from `look` to push the desk back.
 
 ### Swap an object for a .glb
 

@@ -17,7 +17,8 @@
 
 - Project images are the studio's own work (Arian Bayati, Paniz Nikkhah), taken from Arian Bayati's portfolio and from the studio's own photos.
 - The images of Reallabor Zekiwa Zeitz come from the project's page on hfbk-hamburg.de (HFBK Hamburg, Design Department).
-- `assets/bytwo-logo.webp` is the studio's logo.
+- `assets/bytwo-logo.webp` is the studio's logo. `assets/photo-arian-paniz.webp` is the studio's own photo of Arian Bayati and Paniz Nikkhah.
+- The 3D model of The Refusal in the room is a simplified version of the studio's lamp, built in code.
 
 ## Own assets
 

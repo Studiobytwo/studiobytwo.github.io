@@ -125,7 +125,8 @@ body[data-mode="room"][data-zoom="zoomed"] .os {
 /* Zoomed in, the screen fills the view; the hint would sit on top of it. */
 body[data-zoom="zoomed"] .hud-hint,
 body[data-zoom="zoomed"] .hud-brand,
-body[data-zoom="zoomed"] .hud-tools {
+body[data-zoom="zoomed"] .hud-tools,
+body[data-zoom="zoomed"] .hud-dimmer {
   display: none;
 }
 
@@ -175,6 +176,35 @@ body[data-zoom="zoomed"] .hud-tools {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.hud-dimmer {
+  position: absolute;
+  left: 16px;
+  bottom: 88px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: #efe9dc;
+  background: rgba(20, 18, 16, 0.72);
+  border: 1px solid rgba(233, 226, 212, 0.28);
+  border-radius: 2px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.hud-dimmer input {
+  width: 150px;
+  accent-color: #d42a1e;
+  cursor: pointer;
+}
+
+.hud-dimmer output {
+  min-width: 4ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .hud-back {
@@ -271,6 +301,7 @@ body[data-mode="os"] .fallback-host {
 body[data-mode="os"] .room-stage,
 body[data-mode="os"] .css-stage,
 body[data-mode="os"] .hud-tools,
+body[data-mode="os"] .hud-dimmer,
 body[data-mode="os"] .hud-hint,
 body[data-mode="os"] .hud-brand,
 body[data-mode="os"] #btn-back {

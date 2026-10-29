@@ -8,12 +8,13 @@ const FOV = 32;
 const SCREEN_PX_W = 1280; // the StudioOS root is 1280 x 800 CSS px
 const SCREEN = { w: 0.5, h: 0.3125, x: 0, y: 1.11, z: -0.0975 };
 const WIDE = {
-  pos: new THREE.Vector3(1.5, 1.62, 2.45),
-  look: new THREE.Vector3(-0.12, 0.98, -0.12),
+  pos: new THREE.Vector3(2.0, 1.85, 3.3),
+  look: new THREE.Vector3(0.02, 1.12, -0.2),
 };
 const ZOOM_MS = 1600;
 const LAMP_ON = { spot: 9, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
+const REFUSAL_MAX = { light: 2.4, glow: 2.8 }; // at 100% on the dimmer
 
 const UP_NEG = new THREE.Vector3(0, -1, 0);
 
@@ -64,7 +65,7 @@ function place(mesh, x, y, z, { cast = true, receive = true } = {}) {
   return mesh;
 }
 
-export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLampChange }) {
+export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLampChange, onDimmerChange }) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -139,8 +140,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   }
 
   // Shelf on the back wall with three design objects.
-  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.03, 0.22), mat.darkWood), 0.85, 1.45, -0.6));
-  for (const x of [0.4, 1.3]) {
+  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.03, 0.22), mat.darkWood), 1.3, 1.45, -0.6));
+  for (const x of [0.85, 1.75]) {
     room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.2), mat.darkWood), x, 1.38, -0.6));
   }
 
@@ -148,14 +149,14 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const vesselProfile = [
     [0.0, 0.0], [0.05, 0.0], [0.07, 0.04], [0.06, 0.12], [0.035, 0.2], [0.04, 0.23], [0.045, 0.24], [0.035, 0.245], [0.0, 0.245],
   ].map(([x, y]) => new THREE.Vector2(x, y));
-  const vessel = place(new THREE.Mesh(new THREE.LatheGeometry(vesselProfile, 48), mat.glaze), 0.5, 1.465, -0.52);
+  const vessel = place(new THREE.Mesh(new THREE.LatheGeometry(vesselProfile, 48), mat.glaze), 0.95, 1.465, -0.52);
   room.add(vessel);
 
   // Object 2: a cube with a round recess (a stand-in for a cut block).
   const block = new THREE.Group();
   block.add(place(new THREE.Mesh(new RoundedBoxGeometry(0.14, 0.14, 0.14, 2, 0.006), mat.beige), 0, 0.07, 0));
   block.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.01, 32), mat.ink), 0, 0.141, 0, { cast: false }));
-  block.position.set(0.82, 1.465, -0.52);
+  block.position.set(1.27, 1.465, -0.52);
   room.add(block);
 
   // Object 3: a stack of three discs.
@@ -164,7 +165,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     const y = arr.slice(0, i).reduce((s, a) => s + a[1], 0) + h / 2;
     discs.add(place(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 40), m), 0, y, 0));
   });
-  discs.position.set(1.18, 1.465, -0.52);
+  discs.position.set(1.63, 1.465, -0.52);
   room.add(discs);
 
   // ---- monitor -------------------------------------------------------------
@@ -229,6 +230,23 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     room.add(b);
   });
 
+  // A framed photo of the two of us, standing on the desk and turned toward the camera.
+  const photoTex = new THREE.TextureLoader().load('/assets/photo-arian-paniz.webp');
+  photoTex.colorSpace = THREE.SRGBColorSpace;
+  photoTex.anisotropy = 4;
+  const photoFrame = new THREE.Group();
+  photoFrame.add(place(new THREE.Mesh(new RoundedBoxGeometry(0.13, 0.17, 0.012, 2, 0.003), mat.darkWood), 0, 0.085, 0));
+  photoFrame.add(place(
+    new THREE.Mesh(new THREE.PlaneGeometry(0.106, 0.141), new THREE.MeshStandardMaterial({ map: photoTex, roughness: 0.45 })),
+    0, 0.087, 0.0065,
+    { cast: false }
+  ));
+  photoFrame.rotation.order = 'YXZ';
+  photoFrame.rotation.set(-0.14, 0.6, 0);
+  photoFrame.scale.setScalar(1.3);
+  photoFrame.position.set(-0.38, 0.76, 0.02);
+  room.add(photoFrame);
+
   // ---- desk lamp (signature object) ----------------------------------------
   const lamp = new THREE.Group();
   lamp.userData.action = 'lamp';
@@ -279,6 +297,30 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   bounce.position.set(head.x + 0.2, head.y + 0.25, head.z - 0.2);
   room.add(bounce);
 
+  // ---- The Refusal (wall lamp, from the studio's portfolio) ----------------
+  // Three adjustable arms leave one fixed red box. Its light is set by the dimmer.
+  const refusal = new THREE.Group();
+  refusal.userData.action = 'refusal';
+  room.add(refusal);
+  const red = new THREE.MeshStandardMaterial({ color: 0xd42a1e, roughness: 0.42 });
+  const globeMat = new THREE.MeshStandardMaterial({ color: 0xf6f1e8, roughness: 0.35, emissive: 0xffdcae, emissiveIntensity: 0 });
+  const hub = new THREE.Vector3(0.42, 1.72, -0.68);
+  refusal.add(place(new THREE.Mesh(new RoundedBoxGeometry(0.08, 0.11, 0.06, 2, 0.008), red), hub.x, hub.y, hub.z));
+  const armEnds = [
+    new THREE.Vector3(0.12, 1.9, -0.57),
+    new THREE.Vector3(0.45, 2.12, -0.6),
+    new THREE.Vector3(0.76, 1.88, -0.56),
+  ];
+  for (const end of armEnds) {
+    refusal.add(limb(hub, end, 0.007, red));
+    const globe = place(new THREE.Mesh(new THREE.SphereGeometry(0.045, 24, 16), globeMat), end.x, end.y, end.z, { cast: false });
+    refusal.add(globe);
+  }
+  refusal.add(limb(new THREE.Vector3(hub.x, hub.y - 0.05, -0.705), new THREE.Vector3(hub.x, 0, -0.705), 0.004, red));
+  const refusalLight = new THREE.PointLight(0xffd8a8, 0, 3.5, 1.6);
+  refusalLight.position.set(0.44, 1.95, -0.45);
+  room.add(refusalLight);
+
   // ---- lights --------------------------------------------------------------
   const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);
   scene.add(hemi);
@@ -299,6 +341,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     mode: 'wide', // 'wide' | 'moving' | 'zoomed'
     lamp: true,
     lampLevel: 0,
+    dimmer: 0.6, // The Refusal, 0..1
+    dimmerLevel: 0,
+    lastDimmer: 0.6,
     tween: null,
     look: WIDE.look.clone(), // where the camera is looking, kept for tweens
     pointer: { x: 0, y: 0 },
@@ -357,10 +402,16 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     return state.lamp;
   }
 
+  function setDimmer(value) {
+    state.dimmer = Math.min(1, Math.max(0, value));
+    if (state.dimmer > 0) state.lastDimmer = state.dimmer;
+    onDimmerChange?.(state.dimmer);
+  }
+
   // ---- picking -------------------------------------------------------------
   const ray = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
-  const pickables = [hit, body, lamp];
+  const pickables = [hit, body, lamp, refusal];
 
   function pick(event) {
     const rect = renderer.domElement.getBoundingClientRect();
@@ -382,6 +433,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     const action = pick(e);
     if (action === 'monitor') zoomIn();
     if (action === 'lamp') toggleLamp();
+    if (action === 'refusal') setDimmer(state.dimmer > 0 ? 0 : state.lastDimmer || 0.6);
   });
 
   canvasHost.addEventListener('pointermove', (e) => {
@@ -446,6 +498,12 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     bounce.intensity = LAMP_ON.bounce * L;
     monitorLight.intensity = 0.12 + 0.12 * (1 - L);
 
+    // The Refusal follows its dimmer with a short ease, like a real dimmer.
+    state.dimmerLevel += (state.dimmer - state.dimmerLevel) * (1 - Math.exp(-dt * 8));
+    const D = state.dimmerLevel;
+    refusalLight.intensity = REFUSAL_MAX.light * D;
+    globeMat.emissiveIntensity = 0.04 + REFUSAL_MAX.glow * D;
+
     renderer.render(scene, camera);
     cssRenderer.render(cssScene, camera);
   }
@@ -460,6 +518,10 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     zoomIn,
     zoomOut,
     toggleLamp,
+    setDimmer,
+    get dimmer() {
+      return state.dimmer;
+    },
     get zoomed() {
       return state.mode === 'zoomed';
     },

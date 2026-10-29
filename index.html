@@ -66,8 +66,13 @@
       <button id="btn-lamp" class="hud-btn" type="button" aria-pressed="true">Switch lamp off</button>
       <button id="btn-monitor" class="hud-btn" type="button">Zoom to screen</button>
     </div>
+    <div class="hud-dimmer">
+      <label for="dimmer">The Refusal</label>
+      <input id="dimmer" type="range" min="0" max="100" step="1" value="60" aria-valuetext="60 percent">
+      <output id="dimmer-value" for="dimmer">60%</output>
+    </div>
     <button id="btn-back" class="hud-btn hud-back" type="button" hidden>← Back to room</button>
-    <p id="hint" class="hud-hint">Click the monitor to step in. Click the lamp to switch it.</p>
+    <p id="hint" class="hud-hint">Click the monitor to step in. Click a lamp to switch it. Dim The Refusal with the slider.</p>
   </div>
 
   <footer id="site-links" class="site-links">
