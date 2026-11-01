@@ -141,7 +141,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const mat = {
     wood: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 }),
     darkWood: new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.6 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0x6c6e55, roughness: 0.92 }), // olive green, as in the studio
+    wall: new THREE.MeshStandardMaterial({ color: 0x6c6e55, roughness: 0.92 }), // olive green, as in the studio (left wall)
+    sageWall: new THREE.MeshStandardMaterial({ color: 0x9aaa83, roughness: 0.92 }), // sage green chosen by the studio (back wall)
     floor: new THREE.MeshStandardMaterial({ color: 0x252019, roughness: 0.9 }),
     beige: new THREE.MeshStandardMaterial({ color: 0xcfc5b0, roughness: 0.55 }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.4 }),
@@ -168,7 +169,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   floor.rotation.x = -Math.PI / 2;
   room.add(floor);
 
-  const back = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wall), 0, 2.5, -0.72, { cast: false });
+  const back = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.sageWall), 0, 2.5, -0.72, { cast: false });
   room.add(back);
 
   // The left wall meets the back wall in the corner The Refusal is mounted in.
