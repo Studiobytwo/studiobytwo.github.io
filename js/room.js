@@ -142,7 +142,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     wood: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 }),
     darkWood: new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.6 }),
     wall: new THREE.MeshStandardMaterial({ color: 0x6c6e55, roughness: 0.92 }), // olive green, as in the studio (left wall)
-    sageWall: new THREE.MeshStandardMaterial({ color: 0x9aaa83, roughness: 0.92 }), // sage green chosen by the studio (back wall)
+    // Sage green chosen by the studio (#9aaa83). The base is slightly cooler so that,
+    // under the warm lamps, the wall renders as #9aaa83 on screen.
+    sageWall: new THREE.MeshStandardMaterial({ color: 0x96b393, roughness: 0.92, emissive: 0x96b393, emissiveIntensity: 0.14 }),
     floor: new THREE.MeshStandardMaterial({ color: 0x252019, roughness: 0.9 }),
     beige: new THREE.MeshStandardMaterial({ color: 0xcfc5b0, roughness: 0.55 }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.4 }),
@@ -445,7 +447,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   lamp.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.006, 12, 8), mat.brass), 0.1, SHADE.y - 0.092, SHADE.z + 0.05, { cast: false }));
   lamp.updateMatrixWorld(true);
 
-  const lampLight = new THREE.SpotLight(0xffc98a, 0, 2.5, Math.PI / 2.3, 0.8, 1.6);
+  const lampLight = new THREE.SpotLight(0xffe4c4, 0, 2.5, Math.PI / 2.3, 0.8, 1.6);
   lampLight.position.copy(lamp.localToWorld(new THREE.Vector3(0, SHADE.y - 0.02, SHADE.z + 0.01)));
   const lampTarget = new THREE.Object3D();
   lampTarget.position.copy(lamp.localToWorld(new THREE.Vector3(0, -SHADE.y, SHADE.z + 0.14)));
@@ -460,7 +462,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   room.add(lampLight);
 
   // Soft warm bounce from the lamp, so the wall and the logo read when it is on.
-  const bounce = new THREE.PointLight(0xffb070, 0, 4, 1.6);
+  const bounce = new THREE.PointLight(0xffdcb8, 0, 4, 1.6);
   bounce.position.set(-0.45, 1.35, -0.3);
   room.add(bounce);
 
@@ -522,7 +524,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     glow.scale.setScalar(0.36 * S);
     arm.add(glow);
     glows.push(glow);
-    const light = new THREE.PointLight(0xffd6a0, 0, 2.6, 1.7);
+    const light = new THREE.PointLight(0xfff0de, 0, 2.6, 1.7);
     light.position.x = len;
     arm.add(light);
     refusalLights.push(light);
@@ -565,7 +567,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   room.add(plug);
 
   // ---- lights --------------------------------------------------------------
-  const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);
+  const hemi = new THREE.HemisphereLight(0x55534c, 0x0c0b0a, LAMP_OFF.hemi);
   scene.add(hemi);
   const monitorLight = new THREE.PointLight(0x8fb3e6, 0.12, 1.2, 2);
   monitorLight.position.set(0, 1.12, 0.02);

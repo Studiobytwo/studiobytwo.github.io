@@ -108,7 +108,8 @@ Each object in `js/room.js` is built from primitives and procedural materials, a
 - `room` holds the walls, floor, desk and objects on the desk and shelf.
 - `monitor` is the retro computer. Its front is the `hit` plane, which is the click target for the screen.
 - `lamp` is the desk lamp, a banker's lamp (brass base and stem, domed green glass shade with a brass rim, pull chain). Its group has `userData.action = 'lamp'`, which makes it clickable. Brass and glass reflect a small built-in environment (`RoomEnvironment`, vendored in `vendor/three/`).
-- Walls: the back wall is sage green (`mat.sageWall`, #9aaa83), the left wall olive (`mat.wall`).
+- Walls: the back wall is the studio's sage green (`mat.sageWall`). Its base colour is a little cooler than #9aaa83 so it renders as
+  #9aaa83 under the warm lamps; if you change the lights, re-check it on screen. The left wall is olive (`mat.wall`).
 - The left wall meets the back wall at `CORNER`, under a ceiling (`CEILING_Y`). Altbau stucco: stepped cornice, dentil row,
   egg-and-dart row, a carved frieze (`makeFriezeTexture`, also used as a bump map), moulded ceiling frames and a rosette. The Refusal hangs in that corner.
 - `refusal` is The Refusal in that corner: a red box with an angled front, about 20 cm (real) below the ceiling, and three
