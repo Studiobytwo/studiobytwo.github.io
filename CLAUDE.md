@@ -87,14 +87,17 @@ The order of images is the order of the `images:` list in `project.md`.
 ### Where the current content came from
 - The Refusal: photo and exhibition text supplied by the studio, render from the portfolio PDF.
 - Reallabor Zekiwa Zeitz: text and photos from the project's page on hfbk-hamburg.de (German original kept below the English translation).
-- All other projects: text and images extracted from Arian Bayati's portfolio PDF. "Mars 2112" is left out on purpose.
+- Off the Charts with Statista: episode thumbnails and links from Statista's YouTube playlist (@statistaofficial).
+- Ask Tiago: a still from the reel linked in the project, from @ask.tiago on Instagram.
+- Reverse Wood: the film Empheral Reflection is linked (youtu.be/5CmUDZZD5-A); its thumbnail is the second image.
+- Pipe Portable House, Lost in Space, Podia Magazine: from Arian Bayati's portfolio PDF. Left out on purpose: Mars 2112, AI Insta Reel, Color & the Mind, The Iglo Space House, Audiot., Ring of Stars, Oval Candlestick.
 - The ByTwo logo on the room wall is `assets/bytwo-logo.webp`; it is loaded in `js/room.js`.
 
 ## Content: text and contact
 
 - `content/about.md` and `content/contact.md`: paragraphs separated by an empty line. Any e-mail address is turned into a `mailto:` link automatically.
-- The contact address is still a placeholder. Replace `[PLACEHOLDER: studio e-mail]` and `[PLACEHOLDER: city]`.
-- **Legal:** the Impressum and Datenschutz texts in `impressum/index.html` and `datenschutz/index.html` are the single source. StudioOS loads those pages and shows their `<main>`. Every `<span class="ph">[PLATZHALTER ...]</span>` is a placeholder for real details. Fill them in and have the text checked before launch.
+- Contact: Studiobytwo@hotmail.com, Hamburg (in `content/contact.md`, the `<noscript>` block, the Impressum and the Datenschutz).
+- **Legal:** the Impressum and Datenschutz texts in `impressum/index.html` and `datenschutz/index.html` are the single source. StudioOS loads those pages and shows their `<main>`. The address currently has no house number or postcode.
 
 ## Changing the 3D objects
 
@@ -102,11 +105,14 @@ Each object in `js/room.js` is built from primitives and procedural materials, a
 
 - `room` holds the walls, floor, desk and objects on the desk and shelf.
 - `monitor` is the retro computer. Its front is the `hit` plane, which is the click target for the screen.
-- `lamp` is the desk lamp. Its group has `userData.action = 'lamp'`, which makes it clickable.
-- `refusal` is a model of The Refusal on the wall beside the monitor: red box, three arms, three globes, cable.
-  Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
+- `lamp` is the desk lamp, a banker's lamp (brass base and stem, green glass shade, pull chain). Its group has `userData.action = 'lamp'`, which makes it clickable.
+- A wall column right of the desk (`CORNER`) makes the corner The Refusal is mounted in.
+- `refusal` is The Refusal in that corner: a red box flush in the corner, three rods leaving it one above the other
+  (2 m up toward the ceiling, 1.25 m along the column wall, 0.75 m along the back wall), each with an opal globe,
+  and a red cable down the corner. `REFUSAL_SCALE` shrinks the real lengths to the room. Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
   clicking the lamp in 3D switches it off or back to its last level). Brightness at 100% is `REFUSAL_MAX`.
 - `photoFrame` is the framed photo on the desk (`assets/photo-arian-paniz.webp`). Replace that file to change the photo; keep it 3:4 portrait.
+  Clicking it glides the camera to the photo (`zoomIn('photo')`), like the monitor (`zoomIn('screen')`); Back or Escape returns.
 - `WIDE` at the top of `js/room.js` is the starting camera position. Move `pos` further from `look` to push the desk back.
 
 ### Swap an object for a .glb

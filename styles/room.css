@@ -118,8 +118,12 @@ body[data-mode="room"][data-zoom="moving"] .os {
   pointer-events: none !important;
 }
 
-body[data-mode="room"][data-zoom="zoomed"] .os {
+body[data-mode="room"][data-zoom="zoomed"][data-focus="screen"] .os {
   pointer-events: auto !important;
+}
+
+body[data-mode="room"][data-zoom="zoomed"][data-focus="photo"] .os {
+  pointer-events: none !important;
 }
 
 /* Zoomed in, the screen fills the view; the hint would sit on top of it. */

@@ -36,7 +36,7 @@
   </script>
   <script type="module" src="/js/main.js"></script>
 </head>
-<body data-mode="boot" data-zoom="wide">
+<body data-mode="boot" data-zoom="wide" data-focus="screen">
   <a class="skip-link" href="#site-links">Skip to links</a>
 
   <!-- Loading screen. Progress is driven by real loading steps (see js/main.js). -->
@@ -65,6 +65,7 @@
     <div class="hud-tools">
       <button id="btn-lamp" class="hud-btn" type="button" aria-pressed="true">Switch lamp off</button>
       <button id="btn-monitor" class="hud-btn" type="button">Zoom to screen</button>
+      <button id="btn-photo" class="hud-btn" type="button">Look at the photo</button>
     </div>
     <div class="hud-dimmer">
       <label for="dimmer">The Refusal</label>
@@ -72,7 +73,7 @@
       <output id="dimmer-value" for="dimmer">60%</output>
     </div>
     <button id="btn-back" class="hud-btn hud-back" type="button" hidden>← Back to room</button>
-    <p id="hint" class="hud-hint">Click the monitor to step in. Click a lamp to switch it. Dim The Refusal with the slider.</p>
+    <p id="hint" class="hud-hint">Move the cursor around and click wherever a hand appears.</p>
   </div>
 
   <footer id="site-links" class="site-links">
@@ -88,26 +89,22 @@
 
       <h2>Projects</h2>
       <ul>
-        <li>The Refusal, Lighting (with Paniz Nikkhah)</li>
-        <li>Reallabor Zekiwa Zeitz, 2026, Material research (with Paniz Nikkhah)</li>
-        <li>Reverse Wood, Material and product design (with Paniz Nikkhah)</li>
-        <li>The Arniz Oven, Product design (with Paniz Nikkhah)</li>
-        <li>Oval Candlestick, Objects</li>
-        <li>Ring of Stars, 3D design</li>
+        <li>The Refusal, Lighting (Arian Bayati &amp; Paniz Nikkhah)</li>
+        <li>Reallabor Zekiwa Zeitz, 2026, Material research (Arian Bayati &amp; Paniz Nikkhah)</li>
+        <li>Off the Charts with Statista, Video podcast (Arian Bayati &amp; Paniz Nikkhah)</li>
+        <li>Ask Tiago, Social media reels (Arian Bayati &amp; Paniz Nikkhah)</li>
+        <li>Reverse Wood, Material and product design (Arian Bayati &amp; Paniz Nikkhah)</li>
+        <li>The Arniz Oven, Product design (Arian Bayati &amp; Paniz Nikkhah)</li>
         <li>Pipe Portable House, Architecture</li>
-        <li>The Iglo Space House, Architecture</li>
         <li>Lost in Space, Posters</li>
-        <li>Audiot., UI/UX and logo design</li>
         <li>Podia Magazine, Editorial design</li>
-        <li>AI Insta Reel, Motion and social media</li>
-        <li>Color &amp; the Mind, Social media carousel</li>
       </ul>
 
       <h2>About</h2>
       <p>We both study design at HFBK Hamburg (Hochschule für bildende Künste). Our shared work moves between lighting, material research and product design.</p>
 
       <h2>Contact</h2>
-      <p>E-mail: <span class="ph">[PLACEHOLDER: studio e-mail]</span></p>
+      <p>E-mail: <a href="mailto:Studiobytwo@hotmail.com">Studiobytwo@hotmail.com</a> · Hamburg</p>
 
       <p><a href="/impressum/">Impressum</a> · <a href="/datenschutz/">Datenschutz</a></p>
     </main>

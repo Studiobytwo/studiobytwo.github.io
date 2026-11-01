@@ -15,6 +15,20 @@
     "group": "Arian Bayati & Paniz Nikkhah"
   },
   {
+    "slug": "off-the-charts",
+    "title": "Off the Charts with Statista",
+    "category": "Video podcast",
+    "cover": "01.webp",
+    "group": "Arian Bayati & Paniz Nikkhah"
+  },
+  {
+    "slug": "ask-tiago",
+    "title": "Ask Tiago",
+    "category": "Social media reels",
+    "cover": "01.webp",
+    "group": "Arian Bayati & Paniz Nikkhah"
+  },
+  {
     "slug": "reverse-wood",
     "title": "Reverse Wood",
     "category": "Material and product design",
@@ -29,29 +43,8 @@
     "group": "Arian Bayati & Paniz Nikkhah"
   },
   {
-    "slug": "oval-candlestick",
-    "title": "Oval Candlestick",
-    "category": "Objects",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "ring-of-stars",
-    "title": "Ring of Stars",
-    "category": "3D design",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
     "slug": "pipe-portable-house",
     "title": "Pipe Portable House",
-    "category": "Architecture",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "iglo-space-house",
-    "title": "The Iglo Space House",
     "category": "Architecture",
     "cover": "01.webp",
     "group": "Arian Bayati"
@@ -64,30 +57,9 @@
     "group": "Arian Bayati"
   },
   {
-    "slug": "audiot",
-    "title": "Audiot.",
-    "category": "UI/UX and logo design",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
     "slug": "podia-magazine",
     "title": "Podia Magazine",
     "category": "Editorial design",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "ai-insta-reel",
-    "title": "AI Insta Reel",
-    "category": "Motion and social media",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "color-and-the-mind",
-    "title": "Color & the Mind",
-    "category": "Social media carousel",
     "cover": "01.webp",
     "group": "Arian Bayati"
   }

@@ -1,7 +1,7 @@
 Studio by Two
 Arian Bayati and Paniz Nikkhah
 
-E-mail: [PLACEHOLDER: studio e-mail]
-Location: [PLACEHOLDER: city]
+E-mail: Studiobytwo@hotmail.com
+Location: Hamburg, Germany
 
-For commissions, press and exhibitions, please write an e-mail. We reply within a few working days.
+For projects, press and exhibitions, please write an e-mail. We reply within a few working days.

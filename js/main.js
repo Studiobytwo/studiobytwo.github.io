@@ -36,6 +36,10 @@ paintSound();
 // ---- Escape: close the top window, else leave the zoomed monitor ----------
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
+  if (room?.zoomed && room.focus === 'photo') {
+    room.zoomOut();
+    return;
+  }
   if (os.closeTopWindow()) return;
   room?.zoomOut();
 });
@@ -140,20 +144,23 @@ async function revealRoom() {
 // ---- HUD wiring -----------------------------------------------------------
 const btnLamp = $('#btn-lamp');
 const btnMonitor = $('#btn-monitor');
+const btnPhoto = $('#btn-photo');
 const btnBack = $('#btn-back');
 const hint = $('#hint');
 
-function handleZoomChange(mode) {
+function handleZoomChange(mode, focus = 'screen') {
   body.dataset.zoom = mode;
-  os.root.inert = mode !== 'zoomed';
+  body.dataset.focus = focus;
+  const onScreen = mode === 'zoomed' && focus === 'screen';
+  os.root.inert = !onScreen;
   btnMonitor.disabled = mode !== 'wide';
+  btnPhoto.disabled = mode !== 'wide';
   btnBack.hidden = mode !== 'zoomed';
-  hint.textContent =
-    mode === 'zoomed'
-      ? 'Press Escape or use the button to return to the room.'
-      : 'Click the monitor to step in. Click a lamp to switch it. Dim The Refusal with the slider.';
-  if (mode === 'zoomed') {
+  hint.textContent = 'Move the cursor around and click wherever a hand appears.';
+  if (onScreen) {
     os.root.querySelector('.os-icon')?.focus({ preventScroll: true });
+  } else if (mode === 'zoomed') {
+    btnBack.focus({ preventScroll: true });
   }
 }
 
@@ -176,7 +183,8 @@ function handleDimmerChange(level) {
 dimmer.addEventListener('input', () => room?.setDimmer(Number(dimmer.value) / 100));
 
 btnLamp.addEventListener('click', () => room?.toggleLamp());
-btnMonitor.addEventListener('click', () => room?.zoomIn());
+btnMonitor.addEventListener('click', () => room?.zoomIn('screen'));
+btnPhoto.addEventListener('click', () => room?.zoomIn('photo'));
 btnBack.addEventListener('click', () => {
   room?.zoomOut();
   btnMonitor.focus({ preventScroll: true });
