@@ -156,7 +156,7 @@ function handleZoomChange(mode, focus = 'screen') {
   btnMonitor.disabled = mode !== 'wide';
   btnPhoto.disabled = mode !== 'wide';
   btnBack.hidden = mode !== 'zoomed';
-  hint.textContent = 'Move the cursor around and click wherever a hand appears.';
+  hint.textContent = 'Move the cursor around and click wherever a hand appears. Drag the red lamp’s arms to turn them.';
   if (onScreen) {
     os.root.querySelector('.os-icon')?.focus({ preventScroll: true });
   } else if (mode === 'zoomed') {

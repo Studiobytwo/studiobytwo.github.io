@@ -9,15 +9,16 @@ const FOV = 32;
 const SCREEN_PX_W = 1280; // the StudioOS root is 1280 x 800 CSS px
 const SCREEN = { w: 0.5, h: 0.3125, x: 0, y: 1.11, z: -0.0975 };
 const WIDE = {
-  pos: new THREE.Vector3(2.0, 1.85, 3.3),
-  look: new THREE.Vector3(-0.1, 1.5, -0.2),
+  pos: new THREE.Vector3(2.0, 2.2, 3.3),
+  look: new THREE.Vector3(-0.15, 1.3, -0.2),
 };
 const ZOOM_MS = 1600;
 const LAMP_ON = { spot: 5, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
 const REFUSAL_MAX = { light: 1.1, glow: 3.2, halo: 0.75 }; // at 100% on the dimmer (light is per globe)
 // The Refusal's rods are 2 m, 1.25 m and 0.75 m long; the room shows them at this scale.
-const REFUSAL_SCALE = 0.8;
+const REFUSAL_SCALE = 0.7;
+const REFUSAL_BOX_Y = 1.5; // height of the box centre in the room
 const CEILING_Y = 2.52;
 
 function easeInOutCubic(t) {
@@ -65,17 +66,6 @@ function makeGlowTexture() {
   return tex;
 }
 
-// Places a thin cylinder between two points (used for the lamp arms).
-function limb(from, to, radius, material) {
-  const dir = new THREE.Vector3().subVectors(to, from);
-  const len = dir.length();
-  const m = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, len, 16), material);
-  m.position.copy(from).addScaledVector(dir, 0.5);
-  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-  m.castShadow = true;
-  return m;
-}
-
 function place(mesh, x, y, z, { cast = true, receive = true } = {}) {
   mesh.position.set(x, y, z);
   mesh.castShadow = cast;
@@ -108,7 +98,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const mat = {
     wood: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 }),
     darkWood: new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.6 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0x35302a, roughness: 0.95 }),
+    wall: new THREE.MeshStandardMaterial({ color: 0x6c6e55, roughness: 0.92 }), // olive green, as in the studio
     floor: new THREE.MeshStandardMaterial({ color: 0x252019, roughness: 0.9 }),
     beige: new THREE.MeshStandardMaterial({ color: 0xcfc5b0, roughness: 0.55 }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.4 }),
@@ -144,24 +134,31 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   side.rotation.y = Math.PI / 2;
   room.add(side);
 
-  // Ceiling with a plain cornice along both walls.
+  // Ceiling with a stepped white cornice along both walls, white skirting at the floor.
   const ceiling = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshStandardMaterial({ color: 0xe4ddd0, roughness: 0.9 })), 0, CEILING_Y, 0, { cast: false });
   ceiling.rotation.x = Math.PI / 2;
   room.add(ceiling);
-  const corniceMat = new THREE.MeshStandardMaterial({ color: 0xeee8dc, roughness: 0.8 });
-  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(10, 0.1, 0.07), corniceMat), 3.4, CEILING_Y - 0.05, CORNER.z + 0.035, { cast: false }));
-  const corniceSide = place(new THREE.Mesh(new THREE.BoxGeometry(10, 0.1, 0.07), corniceMat), CORNER.x + 0.035, CEILING_Y - 0.05, 4.28, { cast: false });
-  corniceSide.rotation.y = Math.PI / 2;
-  room.add(corniceSide);
+  const whitePaint = new THREE.MeshStandardMaterial({ color: 0xf0ebe1, roughness: 0.75 });
+  // Each step: [height down from the ceiling (or up from the floor), depth from the wall, y].
+  const trims = [
+    [0.15, 0.03, CEILING_Y - 0.075], [0.11, 0.06, CEILING_Y - 0.055], [0.07, 0.1, CEILING_Y - 0.035], // cornice
+    [0.12, 0.018, 0.06], // skirting
+  ];
+  for (const [h, d, y] of trims) {
+    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(10, h, d), whitePaint), CORNER.x + 5, y, CORNER.z + d / 2, { cast: false }));
+    const sideTrim = place(new THREE.Mesh(new THREE.BoxGeometry(10, h, d), whitePaint), CORNER.x + d / 2, y, CORNER.z + 5, { cast: false });
+    sideTrim.rotation.y = Math.PI / 2;
+    room.add(sideTrim);
+  }
 
   // The ByTwo logo, framed, on the back wall.
   const logoTex = new THREE.TextureLoader().load('/assets/bytwo-logo.webp');
   logoTex.colorSpace = THREE.SRGBColorSpace;
   logoTex.anisotropy = 4;
-  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, 0.02), mat.beige), -0.95, 1.44, -0.71, { cast: false }));
+  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, 0.02), mat.beige), 0.42, 1.76, -0.71, { cast: false }));
   room.add(place(
     new THREE.Mesh(new THREE.PlaneGeometry(0.56, 0.56), new THREE.MeshStandardMaterial({ map: logoTex, roughness: 0.6 })),
-    -0.95, 1.44, -0.6985,
+    0.42, 1.76, -0.6985,
     { cast: false }
   ));
 
@@ -354,23 +351,21 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   room.add(bounce);
 
   // ---- The Refusal (from the studio's portfolio) ----------------------------
-  // As in the studio's photos: a red corner box with an angled front, flush in
-  // the corner about 20 cm below the ceiling. Three glossy red rods leave it on
-  // one vertical line, stacked a few centimetres apart. All three are horizontal
-  // (parallel to the ceiling); only their directions differ. Each ends in a
-  // bright opal globe: the longest (2 m) points diagonally out into the room,
-  // the middle one (1.25 m) runs along the left wall, the shortest (0.75 m)
-  // along the back wall. The rods swivel on the real lamp; this is one setting.
-  // A red cable runs down the corner.
+  // A red corner box with an angled front, flush in the corner. Three glossy
+  // red rods leave it on one vertical line, stacked a few centimetres apart.
+  // All three are horizontal; only their directions differ, and visitors can
+  // swivel each one by dragging it, like on the real lamp. Each rod ends in a
+  // 10 cm opal globe: the longest (2 m) points out into the room, the middle
+  // one (1.25 m) runs along the left wall, the shortest (0.75 m) along the back
+  // wall. A red cable runs down the corner and along the wall to a socket.
   const refusal = new THREE.Group();
   refusal.userData.action = 'refusal';
   room.add(refusal);
   const red = new THREE.MeshStandardMaterial({ color: 0xd0201a, roughness: 0.3, envMap, envMapIntensity: 0.35 });
   const globeMat = new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 0.3, emissive: 0xffe4bd, emissiveIntensity: 0 });
-  // Real sizes (box about 10 x 16 cm, globes 15 cm, rods 1.5 cm) times REFUSAL_SCALE.
+  // Real sizes (box about 10 x 16 cm, globes 10 cm, rods 1.5 cm) times REFUSAL_SCALE.
   const S = REFUSAL_SCALE;
-  const BOX = { w: 0.1 * S, h: 0.16 * S };
-  BOX.y = CEILING_Y - 0.2 * S - BOX.h / 2; // centre, 20 cm (real) below the ceiling
+  const BOX = { w: 0.1 * S, h: 0.16 * S, y: REFUSAL_BOX_Y };
   // Box footprint: a square in the corner with the front corner cut off.
   const outline = new THREE.Shape();
   outline.moveTo(0, 0);
@@ -382,33 +377,77 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const boxGeo = new THREE.ExtrudeGeometry(outline, { depth: BOX.h, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.002, bevelSegments: 2 });
   boxGeo.rotateX(-Math.PI / 2); // shape y becomes -z, extrusion becomes +y
   refusal.add(place(new THREE.Mesh(boxGeo, red), CORNER.x, BOX.y - BOX.h / 2, CORNER.z));
-  // The rods leave the angled front face.
+
+  // Each arm pivots on the box's front edge. Its angle is measured from the back
+  // wall (0) to the left wall (90 degrees).
   const front = new THREE.Vector3(CORNER.x + BOX.w * 0.78, 0, CORNER.z + BOX.w * 0.78);
+  const ARM_LIMITS = [THREE.MathUtils.degToRad(6), THREE.MathUtils.degToRad(84)];
   const rods = [
-    { length: 2.0, rise: 0.045 * S, dir: new THREE.Vector3(1, 0, 1) },      // diagonally out into the room
-    { length: 1.25, rise: 0.0, dir: new THREE.Vector3(0.22, 0, 1) },        // along the left wall
-    { length: 0.75, rise: -0.045 * S, dir: new THREE.Vector3(1, 0, 0.22) }, // along the back wall
+    { length: 2.0, rise: 0.045 * S, angle: 32 },  // out into the room
+    { length: 1.25, rise: 0, angle: 80 },         // along the left wall
+    { length: 0.75, rise: -0.045 * S, angle: 10 }, // along the back wall
   ];
   const glowTex = makeGlowTexture();
   const glows = [];
   const refusalLights = [];
-  for (const rod of rods) {
-    const start = new THREE.Vector3(front.x, BOX.y + rod.rise, front.z);
-    const end = start.clone().addScaledVector(rod.dir.normalize(), rod.length * REFUSAL_SCALE);
-    refusal.add(limb(start, end, 0.009 * S, red));
-    refusal.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.075 * S, 32, 20), globeMat), end.x, end.y, end.z, { cast: false }));
+  const arms = [];
+  rods.forEach((rod, index) => {
+    const arm = new THREE.Group();
+    arm.userData.arm = index;
+    arm.position.set(front.x, BOX.y + rod.rise, front.z);
+    const len = rod.length * S;
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.0075 * S * 1.4, 0.0075 * S * 1.4, len, 12), red);
+    tube.rotation.z = -Math.PI / 2; // cylinder axis along the arm (local +x)
+    tube.position.x = len / 2;
+    tube.castShadow = true;
+    arm.add(tube);
+    arm.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.05 * S, 32, 20), globeMat), len, 0, 0, { cast: false }));
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
-    glow.position.copy(end);
-    glow.scale.setScalar(0.6 * S);
-    refusal.add(glow);
+    glow.position.x = len;
+    glow.scale.setScalar(0.5 * S);
+    arm.add(glow);
     glows.push(glow);
     const light = new THREE.PointLight(0xffd6a0, 0, 2.6, 1.7);
-    light.position.copy(end);
-    room.add(light);
+    light.position.x = len;
+    arm.add(light);
     refusalLights.push(light);
+    arm.rotation.y = -THREE.MathUtils.degToRad(rod.angle); // local +x becomes (cos a, 0, sin a)
+    refusal.add(arm);
+    arms.push(arm);
+  });
+
+  // Red cable: out of the box, down the corner, along the back wall to a socket.
+  const socket = { x: CORNER.x + 0.6, y: 0.32 };
+  const off = 0.012; // the cable lies about a centimetre off the wall
+  const run = 0.44; // height of the run along the wall, just above the skirting
+  const cableY = BOX.y - BOX.h / 2;
+  const cable = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(CORNER.x + 0.02, cableY + 0.01, CORNER.z + 0.02),
+    new THREE.Vector3(CORNER.x + off, cableY - 0.06, CORNER.z + off),
+    new THREE.Vector3(CORNER.x + off, (cableY + run) / 2, CORNER.z + off),
+    new THREE.Vector3(CORNER.x + off, run + 0.04, CORNER.z + off),
+    new THREE.Vector3(CORNER.x + off + 0.015, run + 0.005, CORNER.z + off),
+    new THREE.Vector3(CORNER.x + 0.06, run, CORNER.z + off),
+    new THREE.Vector3(socket.x - 0.08, run, CORNER.z + off),
+    new THREE.Vector3(socket.x - 0.012, run - 0.012, CORNER.z + off),
+    new THREE.Vector3(socket.x, run - 0.06, CORNER.z + off + 0.004),
+    new THREE.Vector3(socket.x, socket.y + 0.03, CORNER.z + 0.024),
+  ], false, 'catmullrom', 0.2);
+  const cableMesh = new THREE.Mesh(new THREE.TubeGeometry(cable, 260, 0.004, 8, false), red);
+  refusal.add(cableMesh);
+  // Small white cable clips along the wall.
+  const clipGeo = new THREE.BoxGeometry(0.014, 0.008, 0.014);
+  for (let y = cableY - 0.15; y > run + 0.08; y -= 0.3) {
+    room.add(place(new THREE.Mesh(clipGeo, whitePaint), CORNER.x + off, y, CORNER.z + off, { cast: false }));
   }
-  // Red cable from the box down the corner to the floor.
-  refusal.add(limb(new THREE.Vector3(CORNER.x + 0.02, BOX.y - BOX.h / 2, CORNER.z + 0.02), new THREE.Vector3(CORNER.x + 0.02, 0, CORNER.z + 0.02), 0.005, red));
+  for (let x = CORNER.x + 0.2; x < socket.x - 0.1; x += 0.25) {
+    room.add(place(new THREE.Mesh(clipGeo, whitePaint), x, run, CORNER.z + off, { cast: false }));
+  }
+  // Wall socket with the plug in it.
+  room.add(place(new THREE.Mesh(new RoundedBoxGeometry(0.08, 0.08, 0.012, 2, 0.004), whitePaint), socket.x, socket.y, CORNER.z + 0.006, { cast: false }));
+  const plug = place(new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.03, 20), whitePaint), socket.x, socket.y, CORNER.z + 0.026, { cast: false });
+  plug.rotation.x = Math.PI / 2;
+  room.add(plug);
 
   // ---- lights --------------------------------------------------------------
   const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);
@@ -508,24 +547,56 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const ndc = new THREE.Vector2();
   const pickables = [hit, body, lamp, refusal, photoFrame];
 
+  // Returns { action, arm } for the first clickable object under the pointer.
+  // `arm` is set when the pointer is on one of The Refusal's arms or globes.
   function pick(event) {
     const rect = renderer.domElement.getBoundingClientRect();
     ndc.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObjects(pickables, true);
     for (const h of hits) {
+      let arm = null;
       let o = h.object;
       while (o) {
-        if (o.userData.action) return o.userData.action;
+        if (o.userData.arm !== undefined && arm === null) arm = o.userData.arm;
+        if (o.userData.action) return { action: o.userData.action, arm };
         o = o.parent;
       }
     }
     return null;
   }
 
+  // Dragging an arm of The Refusal sideways swivels it around the box.
+  const drag = { arm: null, startX: 0, startAngle: 0, moved: false, swallowClick: false };
+
+  canvasHost.addEventListener('pointerdown', (e) => {
+    if (state.mode !== 'wide' || e.button !== 0) return;
+    const hit = pick(e);
+    if (!hit || hit.arm === null) return;
+    drag.arm = arms[hit.arm];
+    drag.startX = e.clientX;
+    drag.startAngle = -drag.arm.rotation.y;
+    drag.moved = false;
+    canvasHost.setPointerCapture(e.pointerId);
+    canvasHost.style.cursor = 'grabbing';
+  });
+
+  function endDrag(e) {
+    if (!drag.arm) return;
+    drag.swallowClick = drag.moved; // a drag is not a click on the lamp
+    drag.arm = null;
+    if (canvasHost.hasPointerCapture(e.pointerId)) canvasHost.releasePointerCapture(e.pointerId);
+  }
+  canvasHost.addEventListener('pointerup', endDrag);
+  canvasHost.addEventListener('pointercancel', endDrag);
+
   canvasHost.addEventListener('click', (e) => {
+    if (drag.swallowClick) {
+      drag.swallowClick = false;
+      return;
+    }
     if (state.mode !== 'wide') return;
-    const action = pick(e);
+    const action = pick(e)?.action;
     if (action === 'monitor') zoomIn('screen');
     if (action === 'photo') zoomIn('photo');
     if (action === 'lamp') toggleLamp();
@@ -533,11 +604,20 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   });
 
   canvasHost.addEventListener('pointermove', (e) => {
+    if (drag.arm) {
+      const dx = e.clientX - drag.startX;
+      if (Math.abs(dx) > 4) drag.moved = true;
+      // Dragging right turns the arm toward the back wall, left toward the left wall.
+      const angle = THREE.MathUtils.clamp(drag.startAngle - dx * 0.006, ARM_LIMITS[0], ARM_LIMITS[1]);
+      drag.arm.rotation.y = -angle;
+      return; // keep the camera still while an arm is being turned
+    }
     const rect = renderer.domElement.getBoundingClientRect();
     state.pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     state.pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     if (state.mode === 'wide') {
-      canvasHost.style.cursor = pick(e) ? 'pointer' : '';
+      const hit = pick(e);
+      canvasHost.style.cursor = !hit ? '' : hit.arm !== null ? 'grab' : 'pointer';
     }
   });
 

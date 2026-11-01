@@ -16,7 +16,8 @@ export async function loadText(url) {
 
 // Returns { meta, images, paragraphs }.
 // meta: "key: value" pairs from the front matter. A key with no value followed
-// by "  - item" lines becomes a list (used for `images`).
+// by "  - item" lines becomes a list (used for `images`: "file | alt | caption",
+// where the caption is optional).
 // paragraphs: array of paragraphs, each an array of lines.
 export function parseDoc(source) {
   const text = source.replace(/\r\n?/g, '\n');
@@ -32,8 +33,8 @@ export function parseDoc(source) {
         if (!raw.trim()) continue;
         const item = raw.match(/^\s*-\s+(.*)$/);
         if (item && listKey) {
-          const [file, ...alt] = item[1].split('|');
-          meta[listKey].push({ file: file.trim(), alt: alt.join('|').trim() });
+          const [file, alt = '', caption = ''] = item[1].split('|').map((part) => part.trim());
+          meta[listKey].push({ file, alt, caption });
           continue;
         }
         const kv = raw.match(/^([\w-]+):\s*(.*)$/);
@@ -81,9 +82,17 @@ function appendText(parent, text) {
   parent.append(rest);
 }
 
-// Renders parsed paragraphs into a container as <p> elements.
+// Renders parsed paragraphs into a container as <p> elements. A block whose
+// first line starts with "## " begins with a heading.
 export function renderParagraphs(container, paragraphs) {
-  for (const lines of paragraphs) {
+  for (let lines of paragraphs) {
+    if (lines[0].startsWith('## ')) {
+      const h = document.createElement('h3');
+      h.textContent = lines[0].slice(3);
+      container.append(h);
+      lines = lines.slice(1);
+      if (!lines.length) continue;
+    }
     const p = document.createElement('p');
     lines.forEach((line, i) => {
       if (i) p.append(document.createElement('br'));

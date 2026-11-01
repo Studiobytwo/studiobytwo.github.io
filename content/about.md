@@ -1,5 +1,21 @@
-Studio by Two is the design studio of Arian Bayati and Paniz Nikkhah. We design objects and lamps.
+We are not, strictly speaking, a studio. There’s no office and no sign. But we’re two designers who do everything together, and a thing that big deserves a name, so we gave it one.
 
-We both study design at HFBK Hamburg (Hochschule für bildende Künste). Our shared work moves between lighting, material research, product design and video: a corner lamp that refuses the centre of the room, hemp blocks traced from raw material to window, a mirrored table in reverse wood, a pizza oven built panel by panel, and, for Statista, podcasts and reels made from set design to final colour grade.
+## What we do
 
-Arian also works in 3D design, architecture concepts, graphic and UI design, and video, using Rhino, Blender, AutoCAD, Illustrator, Photoshop, InDesign, Figma, Canva, Premiere Pro and DaVinci Resolve.
+We both study design at HFBK Hamburg. At Statista we’re on the podcast production team: we set the stage, shoot, edit, cut the short pieces, and designed the visual identity. We’ve also made brands, presentations and content for corporate influencers.
+
+On the side, we build stages at U-Need, where Arian is a crew chief. Backstage is where our interest in stage and production design took shape.
+
+We design lamps and do sustainable design at university, and make cool videos in our free time.
+
+## A little about our background
+
+Paniz studied cells, Arian studied machines, and we both wanted a place with more room. Art turned out to be the widest one, and also the furthest from where we started, which is exactly why we stayed.
+
+Before starting our studies at HFBK, we both worked full time as graphic designers.
+
+## How we work
+
+We both start by looking at a project from our own perspective. Then we share and keep the good stuff from each.
+
+Paniz makes the plan and the schedule, goes through every last detail, and wrestles with deadlines. Arian finds the fastest and smartest way through. We argue about exactly this, and somehow it keeps us balanced.

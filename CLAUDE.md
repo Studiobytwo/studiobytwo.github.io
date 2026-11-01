@@ -59,18 +59,19 @@ Each project is a folder under `content/` plus one line in `content/projects.jso
    Lines inside one paragraph are kept as line breaks.
    ```
 
-   Alt text goes after `|`. Every image needs one. Plain text only: no HTML, no markdown.
+   Alt text goes after `|`. Every image needs one. An optional caption can follow after a second `|`; it is shown
+   under the photo (good for making-of steps: `- 03.webp | Alt text | Step 1: Cutting the tube`).
+   Plain text only: no HTML, no markdown.
 4. Add an entry to `content/projects.json`:
 
    ```json
-   { "slug": "lamp-no-2", "title": "Lamp No. 2", "year": "2026", "category": "Lighting", "cover": "01.webp", "group": "Arian Bayati & Paniz Nikkhah" }
+   { "slug": "lamp-no-2", "title": "Lamp No. 2", "year": "2026", "category": "Lighting", "cover": "01.webp" }
    ```
 
    `cover` is the file shown in the Projects list. Keep `title`, `year` and `category` identical to `project.md`.
    `year` is optional: leave it out (in both files) when it is not known.
-   `group` puts the project under a heading in the Projects list. Two groups are in use:
-   `Arian Bayati & Paniz Nikkhah` (studio work, listed first) and `Arian Bayati` (individual work).
-   Keep projects of the same group next to each other in the file.
+   Optional `group`: projects with a `group` are listed under that heading in the Projects window (none use it
+   right now, since every project is shared work). Keep projects of the same group next to each other.
 5. Add the project to the `<noscript>` list in `index.html`, so visitors without JavaScript see it too.
 
 ### Edit a project
@@ -90,12 +91,13 @@ The order of images is the order of the `images:` list in `project.md`.
 - Off the Charts with Statista: episode thumbnails and links from Statista's YouTube playlist (@statistaofficial).
 - Ask Tiago: a still from the reel linked in the project, from @ask.tiago on Instagram.
 - Reverse Wood: the film Empheral Reflection is linked (youtu.be/5CmUDZZD5-A); its thumbnail is the second image.
-- Pipe Portable House, Lost in Space, Podia Magazine: from Arian Bayati's portfolio PDF. Left out on purpose: Mars 2112, AI Insta Reel, Color & the Mind, The Iglo Space House, Audiot., Ring of Stars, Oval Candlestick.
+- Left out on purpose (from Arian Bayati's portfolio PDF): Mars 2112, AI Insta Reel, Color & the Mind, The Iglo Space House, Audiot., Ring of Stars, Oval Candlestick, Pipe Portable House, Lost in Space, Podia Magazine.
+- About (`content/about.md`): the studio's own text.
 - The ByTwo logo on the room wall is `assets/bytwo-logo.webp`; it is loaded in `js/room.js`.
 
 ## Content: text and contact
 
-- `content/about.md` and `content/contact.md`: paragraphs separated by an empty line. Any e-mail address is turned into a `mailto:` link automatically.
+- `content/about.md` and `content/contact.md`: paragraphs separated by an empty line. A line starting with `## ` is a heading. Any e-mail address or web address becomes a link automatically.
 - Contact: Studiobytwo@hotmail.com, Hamburg (in `content/contact.md`, the `<noscript>` block, the Impressum and the Datenschutz).
 - **Legal:** the Impressum and Datenschutz texts in `impressum/index.html` and `datenschutz/index.html` are the single source. StudioOS loads those pages and shows their `<main>`. The address currently has no house number or postcode.
 

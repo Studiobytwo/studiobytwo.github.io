@@ -292,6 +292,7 @@ export function createOS({ sound }) {
     count.setAttribute('aria-live', 'polite');
     bar.append(prev, count, next);
 
+    const caption = el('figcaption', 'os-caption');
     const thumbs = el('div', 'os-thumbs');
     let index = 0;
 
@@ -300,6 +301,8 @@ export function createOS({ sound }) {
       const image = images[index];
       photo.src = `/content/${slug}/${image.file}`;
       photo.alt = image.alt;
+      caption.textContent = image.caption;
+      caption.hidden = !image.caption;
       count.textContent = `${index + 1} / ${images.length}`;
       thumbs.querySelectorAll('button').forEach((b, j) => b.setAttribute('aria-current', j === index ? 'true' : 'false'));
       const upcoming = images[(index + 1) % images.length];
@@ -332,7 +335,7 @@ export function createOS({ sound }) {
       }
     });
 
-    figure.append(stage, bar, thumbs);
+    figure.append(stage, caption, bar, thumbs);
     show(0);
     return figure;
   }

@@ -3,64 +3,37 @@
     "slug": "the-refusal",
     "title": "The Refusal",
     "category": "Lighting",
-    "cover": "cover.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
+    "cover": "cover.webp"
   },
   {
     "slug": "reallabor-zekiwa-zeitz",
     "title": "Reallabor Zekiwa Zeitz",
     "year": "2026",
     "category": "Material research",
-    "cover": "01.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
+    "cover": "01.webp"
   },
   {
     "slug": "off-the-charts",
     "title": "Off the Charts with Statista",
     "category": "Video podcast",
-    "cover": "01.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
+    "cover": "01.webp"
   },
   {
     "slug": "ask-tiago",
     "title": "Ask Tiago",
     "category": "Social media reels",
-    "cover": "01.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
+    "cover": "01.webp"
   },
   {
     "slug": "reverse-wood",
     "title": "Reverse Wood",
     "category": "Material and product design",
-    "cover": "01.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
+    "cover": "01.webp"
   },
   {
     "slug": "the-arniz-oven",
     "title": "The Arniz Oven",
     "category": "Product design",
-    "cover": "01.webp",
-    "group": "Arian Bayati & Paniz Nikkhah"
-  },
-  {
-    "slug": "pipe-portable-house",
-    "title": "Pipe Portable House",
-    "category": "Architecture",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "lost-in-space",
-    "title": "Lost in Space",
-    "category": "Posters",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
-  },
-  {
-    "slug": "podia-magazine",
-    "title": "Podia Magazine",
-    "category": "Editorial design",
-    "cover": "01.webp",
-    "group": "Arian Bayati"
+    "cover": "01.webp"
   }
 ]
