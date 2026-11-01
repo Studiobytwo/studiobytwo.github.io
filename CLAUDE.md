@@ -113,7 +113,8 @@ Each object in `js/room.js` is built from primitives and procedural materials, a
   horizontal rods stacked on one vertical line (2 m diagonally into the room, 1.25 m along the left wall, 0.75 m along the
   back wall; the rods swivel on the real lamp, change `dir` in `rods` to set another arrangement), each with an
   opal globe, a soft glow and its own light,
-  and a red cable down the corner. `REFUSAL_SCALE` shrinks the real lengths to the room. Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
+  and a red cable down the corner, a wall socket and clips. It is modelled at real size (`REFUSAL_SCALE = 1`): 16 mm rods,
+  100 mm Orion glass globes, box high on the wall (`REFUSAL_BOX_Y`). Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
   clicking the lamp in 3D switches it off or back to its last level). Brightness at 100% is `REFUSAL_MAX`.
 - `photoFrame` is the framed photo on the desk (`assets/photo-arian-paniz.webp`). Replace that file to change the photo; keep it 3:4 portrait.
   Clicking it glides the camera to the photo (`zoomIn('photo')`), like the monitor (`zoomIn('screen')`); Back or Escape returns.

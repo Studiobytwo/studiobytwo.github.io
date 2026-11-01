@@ -9,16 +9,16 @@ const FOV = 32;
 const SCREEN_PX_W = 1280; // the StudioOS root is 1280 x 800 CSS px
 const SCREEN = { w: 0.5, h: 0.3125, x: 0, y: 1.11, z: -0.0975 };
 const WIDE = {
-  pos: new THREE.Vector3(2.0, 2.2, 3.3),
-  look: new THREE.Vector3(-0.15, 1.3, -0.2),
+  pos: new THREE.Vector3(2.0, 1.75, 3.3),
+  look: new THREE.Vector3(-0.2, 1.5, -0.2),
 };
 const ZOOM_MS = 1600;
 const LAMP_ON = { spot: 5, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
 const REFUSAL_MAX = { light: 1.1, glow: 3.2, halo: 0.75 }; // at 100% on the dimmer (light is per globe)
 // The Refusal's rods are 2 m, 1.25 m and 0.75 m long; the room shows them at this scale.
-const REFUSAL_SCALE = 0.7;
-const REFUSAL_BOX_Y = 1.5; // height of the box centre in the room
+const REFUSAL_SCALE = 1; // real size: the room is built in metres
+const REFUSAL_BOX_Y = 2.15; // box centre, high on the wall, about 30 cm below the ceiling
 const CEILING_Y = 2.52;
 
 function easeInOutCubic(t) {
@@ -355,7 +355,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   // red rods leave it on one vertical line, stacked a few centimetres apart.
   // All three are horizontal; only their directions differ, and visitors can
   // swivel each one by dragging it, like on the real lamp. Each rod ends in a
-  // 10 cm opal globe: the longest (2 m) points out into the room, the middle
+  // 100 mm opal glass globe (Orion, snow white) on a 16 mm carbon fibre rod:
+  // the longest (2 m) points out into the room, the middle
   // one (1.25 m) runs along the left wall, the shortest (0.75 m) along the back
   // wall. A red cable runs down the corner and along the wall to a socket.
   const refusal = new THREE.Group();
@@ -363,9 +364,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   room.add(refusal);
   const red = new THREE.MeshStandardMaterial({ color: 0xd0201a, roughness: 0.3, envMap, envMapIntensity: 0.35 });
   const globeMat = new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 0.3, emissive: 0xffe4bd, emissiveIntensity: 0 });
-  // Real sizes (box about 10 x 16 cm, globes 10 cm, rods 1.5 cm) times REFUSAL_SCALE.
+  // Real sizes (box about 9 x 15 cm, globes 100 mm, rods 16 mm) times REFUSAL_SCALE.
   const S = REFUSAL_SCALE;
-  const BOX = { w: 0.1 * S, h: 0.16 * S, y: REFUSAL_BOX_Y };
+  const BOX = { w: 0.09 * S, h: 0.15 * S, y: REFUSAL_BOX_Y };
   // Box footprint: a square in the corner with the front corner cut off.
   const outline = new THREE.Shape();
   outline.moveTo(0, 0);
@@ -396,7 +397,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     arm.userData.arm = index;
     arm.position.set(front.x, BOX.y + rod.rise, front.z);
     const len = rod.length * S;
-    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.0075 * S * 1.4, 0.0075 * S * 1.4, len, 12), red);
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.008 * S, 0.008 * S, len, 12), red); // 16 mm rod
     tube.rotation.z = -Math.PI / 2; // cylinder axis along the arm (local +x)
     tube.position.x = len / 2;
     tube.castShadow = true;
@@ -404,7 +405,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     arm.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.05 * S, 32, 20), globeMat), len, 0, 0, { cast: false }));
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
     glow.position.x = len;
-    glow.scale.setScalar(0.5 * S);
+    glow.scale.setScalar(0.36 * S);
     arm.add(glow);
     glows.push(glow);
     const light = new THREE.PointLight(0xffd6a0, 0, 2.6, 1.7);
