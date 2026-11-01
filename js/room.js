@@ -10,14 +10,14 @@ const SCREEN_PX_W = 1280; // the StudioOS root is 1280 x 800 CSS px
 const SCREEN = { w: 0.5, h: 0.3125, x: 0, y: 1.11, z: -0.0975 };
 const WIDE = {
   pos: new THREE.Vector3(2.0, 1.85, 3.3),
-  look: new THREE.Vector3(-0.1, 1.4, -0.2),
+  look: new THREE.Vector3(-0.1, 1.5, -0.2),
 };
 const ZOOM_MS = 1600;
 const LAMP_ON = { spot: 5, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
 const REFUSAL_MAX = { light: 1.1, glow: 3.2, halo: 0.75 }; // at 100% on the dimmer (light is per globe)
 // The Refusal's rods are 2 m, 1.25 m and 0.75 m long; the room shows them at this scale.
-const REFUSAL_SCALE = 0.4;
+const REFUSAL_SCALE = 0.8;
 const CEILING_Y = 2.52;
 
 function easeInOutCubic(t) {
@@ -355,16 +355,22 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
 
   // ---- The Refusal (from the studio's portfolio) ----------------------------
   // As in the studio's photos: a red corner box with an angled front, flush in
-  // the corner below the ceiling. Three glossy red rods leave it one above the
-  // other, each ending in a bright opal globe: the longest (2 m) rises to the
-  // ceiling, the middle one (1.25 m) runs up along the left wall, the shortest
-  // (0.75 m) up along the back wall. A red cable runs down the corner.
+  // the corner about 20 cm below the ceiling. Three glossy red rods leave it on
+  // one vertical line, stacked a few centimetres apart. All three are horizontal
+  // (parallel to the ceiling); only their directions differ. Each ends in a
+  // bright opal globe: the longest (2 m) points diagonally out into the room,
+  // the middle one (1.25 m) runs along the left wall, the shortest (0.75 m)
+  // along the back wall. The rods swivel on the real lamp; this is one setting.
+  // A red cable runs down the corner.
   const refusal = new THREE.Group();
   refusal.userData.action = 'refusal';
   room.add(refusal);
   const red = new THREE.MeshStandardMaterial({ color: 0xd0201a, roughness: 0.3, envMap, envMapIntensity: 0.35 });
   const globeMat = new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 0.3, emissive: 0xffe4bd, emissiveIntensity: 0 });
-  const BOX = { w: 0.055, h: 0.09, y: 1.68 };
+  // Real sizes (box about 10 x 16 cm, globes 15 cm, rods 1.5 cm) times REFUSAL_SCALE.
+  const S = REFUSAL_SCALE;
+  const BOX = { w: 0.1 * S, h: 0.16 * S };
+  BOX.y = CEILING_Y - 0.2 * S - BOX.h / 2; // centre, 20 cm (real) below the ceiling
   // Box footprint: a square in the corner with the front corner cut off.
   const outline = new THREE.Shape();
   outline.moveTo(0, 0);
@@ -379,9 +385,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   // The rods leave the angled front face.
   const front = new THREE.Vector3(CORNER.x + BOX.w * 0.78, 0, CORNER.z + BOX.w * 0.78);
   const rods = [
-    { length: 2.0, rise: 0.028, dir: new THREE.Vector3(0.13, 1, 0.13) },   // up to the ceiling
-    { length: 1.25, rise: 0.0, dir: new THREE.Vector3(0.14, 0.5, 1) },     // up along the left wall
-    { length: 0.75, rise: -0.028, dir: new THREE.Vector3(1, 0.45, 0.14) }, // up along the back wall
+    { length: 2.0, rise: 0.045 * S, dir: new THREE.Vector3(1, 0, 1) },      // diagonally out into the room
+    { length: 1.25, rise: 0.0, dir: new THREE.Vector3(0.22, 0, 1) },        // along the left wall
+    { length: 0.75, rise: -0.045 * S, dir: new THREE.Vector3(1, 0, 0.22) }, // along the back wall
   ];
   const glowTex = makeGlowTexture();
   const glows = [];
@@ -389,11 +395,11 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   for (const rod of rods) {
     const start = new THREE.Vector3(front.x, BOX.y + rod.rise, front.z);
     const end = start.clone().addScaledVector(rod.dir.normalize(), rod.length * REFUSAL_SCALE);
-    refusal.add(limb(start, end, 0.0065, red));
-    refusal.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.034, 32, 20), globeMat), end.x, end.y, end.z, { cast: false }));
+    refusal.add(limb(start, end, 0.009 * S, red));
+    refusal.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.075 * S, 32, 20), globeMat), end.x, end.y, end.z, { cast: false }));
     const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
     glow.position.copy(end);
-    glow.scale.setScalar(0.3);
+    glow.scale.setScalar(0.6 * S);
     refusal.add(glow);
     glows.push(glow);
     const light = new THREE.PointLight(0xffd6a0, 0, 2.6, 1.7);
@@ -402,7 +408,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     refusalLights.push(light);
   }
   // Red cable from the box down the corner to the floor.
-  refusal.add(limb(new THREE.Vector3(CORNER.x + 0.014, BOX.y - BOX.h / 2, CORNER.z + 0.014), new THREE.Vector3(CORNER.x + 0.014, 0, CORNER.z + 0.014), 0.0035, red));
+  refusal.add(limb(new THREE.Vector3(CORNER.x + 0.02, BOX.y - BOX.h / 2, CORNER.z + 0.02), new THREE.Vector3(CORNER.x + 0.02, 0, CORNER.z + 0.02), 0.005, red));
 
   // ---- lights --------------------------------------------------------------
   const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);

@@ -107,8 +107,9 @@ Each object in `js/room.js` is built from primitives and procedural materials, a
 - `monitor` is the retro computer. Its front is the `hit` plane, which is the click target for the screen.
 - `lamp` is the desk lamp, a banker's lamp (brass base and stem, domed green glass shade with a brass rim, pull chain). Its group has `userData.action = 'lamp'`, which makes it clickable. Brass and glass reflect a small built-in environment (`RoomEnvironment`, vendored in `vendor/three/`).
 - The left wall meets the back wall at `CORNER`, under a ceiling (`CEILING_Y`) with a cornice. The Refusal hangs in that corner.
-- `refusal` is The Refusal in that corner: a red box with an angled front flush in the corner, three rods leaving it
-  one above the other (2 m up to the ceiling, 1.25 m up along the left wall, 0.75 m up along the back wall), each with an
+- `refusal` is The Refusal in that corner: a red box with an angled front, about 20 cm (real) below the ceiling, and three
+  horizontal rods stacked on one vertical line (2 m diagonally into the room, 1.25 m along the left wall, 0.75 m along the
+  back wall; the rods swivel on the real lamp, change `dir` in `rods` to set another arrangement), each with an
   opal globe, a soft glow and its own light,
   and a red cable down the corner. `REFUSAL_SCALE` shrinks the real lengths to the room. Its light follows the dimmer (`setDimmer(0..1)`; the slider `#dimmer` in `index.html` drives it, and
   clicking the lamp in 3D switches it off or back to its last level). Brightness at 100% is `REFUSAL_MAX`.
