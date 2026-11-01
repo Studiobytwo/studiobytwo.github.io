@@ -3,20 +3,22 @@
 import * as THREE from 'three';
 import { CSS3DRenderer, CSS3DObject } from '/vendor/three/CSS3DRenderer.js';
 import { RoundedBoxGeometry } from '/vendor/three/RoundedBoxGeometry.js';
+import { RoomEnvironment } from '/vendor/three/RoomEnvironment.js';
 
 const FOV = 32;
 const SCREEN_PX_W = 1280; // the StudioOS root is 1280 x 800 CSS px
 const SCREEN = { w: 0.5, h: 0.3125, x: 0, y: 1.11, z: -0.0975 };
 const WIDE = {
   pos: new THREE.Vector3(2.0, 1.85, 3.3),
-  look: new THREE.Vector3(0.28, 1.2, -0.2),
+  look: new THREE.Vector3(-0.1, 1.4, -0.2),
 };
 const ZOOM_MS = 1600;
 const LAMP_ON = { spot: 5, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
-const REFUSAL_MAX = { light: 2.4, glow: 2.8 }; // at 100% on the dimmer
+const REFUSAL_MAX = { light: 1.1, glow: 3.2, halo: 0.75 }; // at 100% on the dimmer (light is per globe)
 // The Refusal's rods are 2 m, 1.25 m and 0.75 m long; the room shows them at this scale.
-const REFUSAL_SCALE = 0.35;
+const REFUSAL_SCALE = 0.4;
+const CEILING_Y = 2.52;
 
 function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -44,6 +46,22 @@ function makeWoodTexture() {
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
   tex.anisotropy = 4;
+  return tex;
+}
+
+// Soft round glow for the opal globes (drawn additively around each globe).
+function makeGlowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, 'rgba(255, 236, 205, 1)');
+  grad.addColorStop(0.25, 'rgba(255, 214, 160, 0.45)');
+  grad.addColorStop(1, 'rgba(255, 200, 140, 0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
 
@@ -75,6 +93,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.domElement.setAttribute('aria-hidden', 'true');
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   canvasHost.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -95,8 +115,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     plastic: new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.45 }),
     keys: new THREE.MeshStandardMaterial({ color: 0x3a3936, roughness: 0.6 }),
     pad: new THREE.MeshStandardMaterial({ color: 0x2b2622, roughness: 0.95 }),
-    brass: new THREE.MeshStandardMaterial({ color: 0xb08d57, roughness: 0.3, metalness: 0.85 }),
-    greenGlass: new THREE.MeshStandardMaterial({ color: 0x1d7a35, roughness: 0.18, metalness: 0.1, side: THREE.FrontSide, emissive: 0x1a8a35, emissiveIntensity: 0 }),
+    brass: new THREE.MeshStandardMaterial({ color: 0xc19a5b, roughness: 0.28, metalness: 0.9, envMap, envMapIntensity: 0.55 }),
+    greenGlass: new THREE.MeshStandardMaterial({ color: 0x1fa33c, roughness: 0.1, metalness: 0, envMap, envMapIntensity: 0.9, emissive: 0x13802c, emissiveIntensity: 0 }),
     shadeInner: new THREE.MeshStandardMaterial({ color: 0xfff4e0, roughness: 0.5, side: THREE.BackSide, emissive: 0xffd8a0, emissiveIntensity: 0 }),
     terracotta: new THREE.MeshStandardMaterial({ color: 0xb5603a, roughness: 0.7 }),
     glaze: new THREE.MeshStandardMaterial({ color: 0x9db0a0, roughness: 0.3 }),
@@ -118,14 +138,21 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const back = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wall), 0, 2.5, -0.72, { cast: false });
   room.add(back);
 
-  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wall), -2.2, 2.5, 0, { cast: false });
+  // The left wall meets the back wall in the corner The Refusal is mounted in.
+  const CORNER = { x: -1.6, z: -0.72 };
+  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wall), CORNER.x, 2.5, 0, { cast: false });
   side.rotation.y = Math.PI / 2;
   room.add(side);
 
-  // Wall column to the right of the desk. Its right face and the back wall form
-  // the corner The Refusal is mounted in.
-  const CORNER = { x: 1.05, z: -0.72 };
-  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.17, 5, 0.52), mat.wall), CORNER.x - 0.085, 2.5, CORNER.z + 0.26, { cast: false }));
+  // Ceiling with a plain cornice along both walls.
+  const ceiling = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 10), new THREE.MeshStandardMaterial({ color: 0xe4ddd0, roughness: 0.9 })), 0, CEILING_Y, 0, { cast: false });
+  ceiling.rotation.x = Math.PI / 2;
+  room.add(ceiling);
+  const corniceMat = new THREE.MeshStandardMaterial({ color: 0xeee8dc, roughness: 0.8 });
+  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(10, 0.1, 0.07), corniceMat), 3.4, CEILING_Y - 0.05, CORNER.z + 0.035, { cast: false }));
+  const corniceSide = place(new THREE.Mesh(new THREE.BoxGeometry(10, 0.1, 0.07), corniceMat), CORNER.x + 0.035, CEILING_Y - 0.05, 4.28, { cast: false });
+  corniceSide.rotation.y = Math.PI / 2;
+  room.add(corniceSide);
 
   // The ByTwo logo, framed, on the back wall.
   const logoTex = new THREE.TextureLoader().load('/assets/bytwo-logo.webp');
@@ -145,24 +172,24 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.72, 0.05), mat.darkWood), x, 0.36, z));
   }
 
-  // Shelf on the back wall, right of the column, with three design objects.
-  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.03, 0.22), mat.darkWood), 1.48, 1.05, -0.6));
-  for (const x of [1.16, 1.8]) {
-    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.2), mat.darkWood), x, 0.98, -0.6));
+  // Shelf on the back wall with three design objects.
+  room.add(place(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.03, 0.22), mat.darkWood), 1.3, 1.45, -0.6));
+  for (const x of [0.85, 1.75]) {
+    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.2), mat.darkWood), x, 1.38, -0.6));
   }
 
   // Object 1: a turned vessel (lathe profile).
   const vesselProfile = [
     [0.0, 0.0], [0.05, 0.0], [0.07, 0.04], [0.06, 0.12], [0.035, 0.2], [0.04, 0.23], [0.045, 0.24], [0.035, 0.245], [0.0, 0.245],
   ].map(([x, y]) => new THREE.Vector2(x, y));
-  const vessel = place(new THREE.Mesh(new THREE.LatheGeometry(vesselProfile, 48), mat.glaze), 1.24, 1.065, -0.52);
+  const vessel = place(new THREE.Mesh(new THREE.LatheGeometry(vesselProfile, 48), mat.glaze), 0.95, 1.465, -0.52);
   room.add(vessel);
 
   // Object 2: a cube with a round recess (a stand-in for a cut block).
   const block = new THREE.Group();
   block.add(place(new THREE.Mesh(new RoundedBoxGeometry(0.14, 0.14, 0.14, 2, 0.006), mat.beige), 0, 0.07, 0));
   block.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.01, 32), mat.ink), 0, 0.141, 0, { cast: false }));
-  block.position.set(1.48, 1.065, -0.52);
+  block.position.set(1.27, 1.465, -0.52);
   room.add(block);
 
   // Object 3: a stack of three discs.
@@ -171,7 +198,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     const y = arr.slice(0, i).reduce((s, a) => s + a[1], 0) + h / 2;
     discs.add(place(new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 40), m), 0, y, 0));
   });
-  discs.position.set(1.72, 1.065, -0.52);
+  discs.position.set(1.63, 1.465, -0.52);
   room.add(discs);
 
   // ---- monitor -------------------------------------------------------------
@@ -266,6 +293,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   lamp.userData.action = 'lamp';
   lamp.position.set(-0.62, 0.76, -0.04);
   lamp.rotation.y = 0.66; // the long side of the shade faces the camera
+  lamp.scale.setScalar(1.2);
   room.add(lamp);
   lamp.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 0.018, 48), mat.brass), 0, 0.009, -0.01));
   lamp.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.02, 40), mat.brass), 0, 0.028, -0.03));
@@ -276,27 +304,28 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     new THREE.Vector3(0, 0.12, -0.04),
     new THREE.Vector3(0, 0.24, -0.046),
     new THREE.Vector3(0, 0.33, -0.02),
-    new THREE.Vector3(0, 0.38, 0.01),
+    new THREE.Vector3(0, 0.392, -0.012),
   ]);
   const stem = new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 32, 0.008, 12), mat.brass);
   stem.castShadow = true;
   lamp.add(stem);
 
-  // Shade: the top half of a cylinder lying on its side, green outside, warm white inside.
+  // Shade: an elongated glass dome, green outside, warm white inside.
   const SHADE = { r: 0.07, len: 0.3, y: 0.345, z: 0.045 };
+  const domeGeo = new THREE.SphereGeometry(1, 48, 16, 0, Math.PI * 2, 0, Math.PI / 2);
   for (const material of [mat.greenGlass, mat.shadeInner]) {
-    const half = new THREE.Mesh(new THREE.CylinderGeometry(SHADE.r, SHADE.r, SHADE.len, 48, 1, true, 0, Math.PI), material);
-    half.rotation.z = Math.PI / 2;
-    half.position.set(0, SHADE.y, SHADE.z);
-    half.castShadow = material === mat.greenGlass;
-    lamp.add(half);
+    const dome = new THREE.Mesh(domeGeo, material);
+    dome.scale.set(SHADE.len / 2, SHADE.r, 0.085);
+    dome.position.set(0, SHADE.y, SHADE.z);
+    dome.castShadow = material === mat.greenGlass;
+    lamp.add(dome);
   }
-  for (const side of [-1, 1]) {
-    const cap = new THREE.Mesh(new THREE.CircleGeometry(SHADE.r, 32, 0, Math.PI), mat.greenGlass);
-    cap.rotation.y = side * Math.PI / 2;
-    cap.position.set(side * SHADE.len / 2, SHADE.y, SHADE.z);
-    lamp.add(cap);
-  }
+  // Brass rim around the lower edge of the shade.
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 8, 64), mat.brass);
+  rim.rotation.x = Math.PI / 2;
+  rim.scale.set(SHADE.len / 2, 0.085, 0.12);
+  rim.position.set(0, SHADE.y, SHADE.z);
+  lamp.add(rim);
   lamp.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 12), mat.brass), 0, SHADE.y + SHADE.r, SHADE.z));
   const bulb = place(new THREE.Mesh(new THREE.SphereGeometry(0.018, 16, 12), mat.bulb), 0, SHADE.y - 0.01, SHADE.z, { cast: false });
   lamp.add(bulb);
@@ -325,37 +354,55 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   room.add(bounce);
 
   // ---- The Refusal (from the studio's portfolio) ----------------------------
-  // A red box sits flush in the wall corner. Three rods leave it one above the
-  // other, each ending in an opal globe: the longest (2 m) rises toward the
-  // ceiling, the middle one (1.25 m) runs along the column wall, the shortest
-  // (0.75 m) along the back wall. The dimmer sets the light.
+  // As in the studio's photos: a red corner box with an angled front, flush in
+  // the corner below the ceiling. Three glossy red rods leave it one above the
+  // other, each ending in a bright opal globe: the longest (2 m) rises to the
+  // ceiling, the middle one (1.25 m) runs up along the left wall, the shortest
+  // (0.75 m) up along the back wall. A red cable runs down the corner.
   const refusal = new THREE.Group();
   refusal.userData.action = 'refusal';
   room.add(refusal);
-  const red = new THREE.MeshStandardMaterial({ color: 0xd42a1e, roughness: 0.42 });
-  const globeMat = new THREE.MeshStandardMaterial({ color: 0xf6f1e8, roughness: 0.35, emissive: 0xffdcae, emissiveIntensity: 0 });
-  const BOX = { w: 0.06, h: 0.1, y: 1.42 };
-  const boxCenter = new THREE.Vector3(CORNER.x + BOX.w / 2, BOX.y, CORNER.z + BOX.w / 2);
-  refusal.add(place(new THREE.Mesh(new RoundedBoxGeometry(BOX.w, BOX.h, BOX.w, 2, 0.006), red), boxCenter.x, boxCenter.y, boxCenter.z));
-  const front = new THREE.Vector3(CORNER.x + BOX.w * 0.8, 0, CORNER.z + BOX.w * 0.8); // the box's front edge
+  const red = new THREE.MeshStandardMaterial({ color: 0xd0201a, roughness: 0.3, envMap, envMapIntensity: 0.35 });
+  const globeMat = new THREE.MeshStandardMaterial({ color: 0xfaf6ee, roughness: 0.3, emissive: 0xffe4bd, emissiveIntensity: 0 });
+  const BOX = { w: 0.055, h: 0.09, y: 1.68 };
+  // Box footprint: a square in the corner with the front corner cut off.
+  const outline = new THREE.Shape();
+  outline.moveTo(0, 0);
+  outline.lineTo(BOX.w, 0);
+  outline.lineTo(BOX.w, -BOX.w * 0.5);
+  outline.lineTo(BOX.w * 0.5, -BOX.w);
+  outline.lineTo(0, -BOX.w);
+  outline.closePath();
+  const boxGeo = new THREE.ExtrudeGeometry(outline, { depth: BOX.h, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.002, bevelSegments: 2 });
+  boxGeo.rotateX(-Math.PI / 2); // shape y becomes -z, extrusion becomes +y
+  refusal.add(place(new THREE.Mesh(boxGeo, red), CORNER.x, BOX.y - BOX.h / 2, CORNER.z));
+  // The rods leave the angled front face.
+  const front = new THREE.Vector3(CORNER.x + BOX.w * 0.78, 0, CORNER.z + BOX.w * 0.78);
   const rods = [
-    { length: 2.0, rise: 0.035, dir: new THREE.Vector3(0.22, 1, 0.3) },   // up toward the ceiling
-    { length: 1.25, rise: 0.0, dir: new THREE.Vector3(0.04, 0.45, 1) },   // along the column wall
-    { length: 0.75, rise: -0.035, dir: new THREE.Vector3(1, 0.45, 0.05) }, // along the back wall
+    { length: 2.0, rise: 0.028, dir: new THREE.Vector3(0.13, 1, 0.13) },   // up to the ceiling
+    { length: 1.25, rise: 0.0, dir: new THREE.Vector3(0.14, 0.5, 1) },     // up along the left wall
+    { length: 0.75, rise: -0.028, dir: new THREE.Vector3(1, 0.45, 0.14) }, // up along the back wall
   ];
-  const globeEnds = [];
+  const glowTex = makeGlowTexture();
+  const glows = [];
+  const refusalLights = [];
   for (const rod of rods) {
     const start = new THREE.Vector3(front.x, BOX.y + rod.rise, front.z);
     const end = start.clone().addScaledVector(rod.dir.normalize(), rod.length * REFUSAL_SCALE);
-    refusal.add(limb(start, end, 0.0055, red));
-    refusal.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.032, 24, 16), globeMat), end.x, end.y, end.z, { cast: false }));
-    globeEnds.push(end);
+    refusal.add(limb(start, end, 0.0065, red));
+    refusal.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.034, 32, 20), globeMat), end.x, end.y, end.z, { cast: false }));
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 }));
+    glow.position.copy(end);
+    glow.scale.setScalar(0.3);
+    refusal.add(glow);
+    glows.push(glow);
+    const light = new THREE.PointLight(0xffd6a0, 0, 2.6, 1.7);
+    light.position.copy(end);
+    room.add(light);
+    refusalLights.push(light);
   }
-  // Red cable down the corner to the floor.
-  refusal.add(limb(new THREE.Vector3(CORNER.x + 0.012, BOX.y - BOX.h / 2, CORNER.z + 0.012), new THREE.Vector3(CORNER.x + 0.012, 0, CORNER.z + 0.012), 0.004, red));
-  const refusalLight = new THREE.PointLight(0xffd8a8, 0, 3.5, 1.6);
-  refusalLight.position.copy(globeEnds.reduce((sum, p) => sum.add(p), new THREE.Vector3()).divideScalar(3)).add(new THREE.Vector3(0.05, 0, 0.1));
-  room.add(refusalLight);
+  // Red cable from the box down the corner to the floor.
+  refusal.add(limb(new THREE.Vector3(CORNER.x + 0.014, BOX.y - BOX.h / 2, CORNER.z + 0.014), new THREE.Vector3(CORNER.x + 0.014, 0, CORNER.z + 0.014), 0.0035, red));
 
   // ---- lights --------------------------------------------------------------
   const hemi = new THREE.HemisphereLight(0x5a4c40, 0x0c0a09, LAMP_OFF.hemi);
@@ -545,8 +592,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     // The Refusal follows its dimmer with a short ease, like a real dimmer.
     state.dimmerLevel += (state.dimmer - state.dimmerLevel) * (1 - Math.exp(-dt * 8));
     const D = state.dimmerLevel;
-    refusalLight.intensity = REFUSAL_MAX.light * D;
-    globeMat.emissiveIntensity = 0.04 + REFUSAL_MAX.glow * D;
+    for (const light of refusalLights) light.intensity = REFUSAL_MAX.light * D;
+    for (const glow of glows) glow.material.opacity = REFUSAL_MAX.halo * D;
+    globeMat.emissiveIntensity = 0.05 + REFUSAL_MAX.glow * D;
 
     renderer.render(scene, camera);
     cssRenderer.render(cssScene, camera);

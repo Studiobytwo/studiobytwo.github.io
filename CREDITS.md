@@ -2,7 +2,7 @@
 
 ## Software
 
-- **Three.js r169** (`vendor/three/three.module.min.js`, `CSS3DRenderer.js`, `RoundedBoxGeometry.js`): MIT License. Copyright 2010-2024 three.js authors. Licence text in `vendor/three/LICENSE-three.txt`.
+- **Three.js r169** (`vendor/three/three.module.min.js`, `CSS3DRenderer.js`, `RoundedBoxGeometry.js`, `RoomEnvironment.js`): MIT License. Copyright 2010-2024 three.js authors. Licence text in `vendor/three/LICENSE-three.txt`.
 
 ## Fonts (self-hosted, `vendor/fonts/`)
 
