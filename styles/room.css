@@ -159,9 +159,8 @@ body[data-zoom="zoomed"] .hud-dimmer {
 
 .hud-hint {
   position: absolute;
-  top: 52px;
-  right: 16px;
-  text-align: right;
+  left: 16px;
+  bottom: 136px; /* just above the dimmer */
   max-width: 38ch;
   margin: 0;
   font-size: 12px;

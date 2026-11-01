@@ -50,6 +50,49 @@ function makeWoodTexture() {
   return tex;
 }
 
+// Stucco frieze: a repeating band of scrolls and leaves, as in old German
+// buildings. Used as colour and as a bump map so it reads as relief.
+function makeFriezeTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 96;
+  const g = c.getContext('2d');
+  g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, 512, 96);
+  g.strokeStyle = '#d2ccc1';
+  g.fillStyle = '#ddd8ce';
+  g.lineCap = 'round';
+  for (let i = 0; i < 4; i++) {
+    const x = i * 128 + 64;
+    // a scroll on each side of a central leaf
+    for (const dir of [-1, 1]) {
+      g.lineWidth = 5;
+      g.beginPath();
+      for (let t = 0; t < 1; t += 0.02) {
+        const a = t * Math.PI * 3.2;
+        const r = 30 * (1 - t);
+        g.lineTo(x + dir * (18 + Math.cos(a) * r), 48 + Math.sin(a) * r * 0.9);
+      }
+      g.stroke();
+    }
+    g.beginPath();
+    g.ellipse(x, 48, 9, 30, 0, 0, Math.PI * 2);
+    g.fill();
+    g.lineWidth = 2;
+    g.beginPath();
+    g.moveTo(x, 20);
+    g.lineTo(x, 76);
+    g.stroke();
+  }
+  g.lineWidth = 3;
+  g.strokeRect(1, 6, 510, 84);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.repeat.set(14, 1);
+  return tex;
+}
+
 // Soft round glow for the opal globes (drawn additively around each globe).
 function makeGlowTexture() {
   const c = document.createElement('canvas');
@@ -150,6 +193,76 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     sideTrim.rotation.y = Math.PI / 2;
     room.add(sideTrim);
   }
+
+  // ---- stucco: Altbau cornice details and ceiling mouldings ----------------
+  // Both walls get the same profile: a dentil row, an egg-and-dart row and a
+  // carved frieze below the stepped cornice. The ceiling gets moulded frames
+  // and a rosette.
+  const stuccoRuns = [
+    { along: 'x', place: (t, y, d) => [CORNER.x + t, y, CORNER.z + d] },
+    { along: 'z', place: (t, y, d) => [CORNER.x + d, y, CORNER.z + t] },
+  ];
+  const RUN = 8; // metres of wall each run covers
+  const dentilGeo = new THREE.BoxGeometry(0.024, 0.032, 0.03);
+  const eggGeo = new THREE.SphereGeometry(1, 10, 8);
+  for (const run of stuccoRuns) {
+    const dentils = new THREE.InstancedMesh(dentilGeo, whitePaint, Math.floor(RUN / 0.045));
+    const eggs = new THREE.InstancedMesh(eggGeo, whitePaint, Math.floor(RUN / 0.038));
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const scale = new THREE.Vector3();
+    for (let i = 0; i < dentils.count; i++) {
+      const [x, y, z] = run.place(0.03 + i * 0.045, CEILING_Y - 0.166, 0.015);
+      dentils.setMatrixAt(i, m.makeTranslation(x, y, z));
+    }
+    for (let i = 0; i < eggs.count; i++) {
+      const [x, y, z] = run.place(0.03 + i * 0.038, CEILING_Y - 0.198, 0.004);
+      scale.set(run.along === 'x' ? 0.011 : 0.008, 0.015, run.along === 'x' ? 0.008 : 0.011);
+      eggs.setMatrixAt(i, m.compose(new THREE.Vector3(x, y, z), q, scale));
+    }
+    room.add(dentils, eggs);
+  }
+  // Carved frieze band under the eggs, and a thin bead under that.
+  const friezeTex = makeFriezeTexture();
+  const friezeMat = new THREE.MeshStandardMaterial({ map: friezeTex, bumpMap: friezeTex, bumpScale: 4, roughness: 0.85 });
+  for (const [h, d, y, mat2] of [[0.1, 0.008, CEILING_Y - 0.27, friezeMat], [0.014, 0.016, CEILING_Y - 0.327, whitePaint]]) {
+    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(RUN, h, d), mat2), CORNER.x + RUN / 2, y, CORNER.z + d / 2, { cast: false }));
+    const sideBand = place(new THREE.Mesh(new THREE.BoxGeometry(RUN, h, d), mat2), CORNER.x + d / 2, y, CORNER.z + RUN / 2, { cast: false });
+    sideBand.rotation.y = Math.PI / 2;
+    room.add(sideBand);
+  }
+  // Ceiling: two moulded frames running parallel to the walls.
+  for (const inset of [0.42, 0.52]) {
+    const w = inset === 0.42 ? 0.04 : 0.022;
+    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(RUN, 0.02, w), whitePaint), CORNER.x + inset + RUN / 2, CEILING_Y - 0.01, CORNER.z + inset, { cast: false }));
+    room.add(place(new THREE.Mesh(new THREE.BoxGeometry(w, 0.02, RUN), whitePaint), CORNER.x + inset, CEILING_Y - 0.01, CORNER.z + inset + RUN / 2, { cast: false }));
+  }
+  // Ceiling rosette: stacked rings with a ring of leaves.
+  const rosette = new THREE.Group();
+  rosette.position.set(0.3, CEILING_Y, 1.2);
+  [[0.34, 0.016], [0.27, 0.02], [0.18, 0.024]].forEach(([r, t], i) => {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r, t, 10, 64), whitePaint);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = -0.012 - i * 0.012;
+    rosette.add(ring);
+  });
+  const leafGeo = new THREE.SphereGeometry(1, 10, 8);
+  const leaves = new THREE.InstancedMesh(leafGeo, whitePaint, 16);
+  const lm = new THREE.Matrix4();
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    lm.compose(
+      new THREE.Vector3(Math.cos(a) * 0.225, -0.03, Math.sin(a) * 0.225),
+      new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), -a),
+      new THREE.Vector3(0.045, 0.014, 0.02)
+    );
+    leaves.setMatrixAt(i, lm);
+  }
+  rosette.add(leaves);
+  const boss = new THREE.Mesh(new THREE.SphereGeometry(0.07, 24, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), whitePaint);
+  boss.position.y = -0.03;
+  rosette.add(boss);
+  room.add(rosette);
 
   // The ByTwo logo, framed, on the back wall.
   const logoTex = new THREE.TextureLoader().load('/assets/bytwo-logo.webp');
