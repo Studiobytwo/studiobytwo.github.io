@@ -13,7 +13,7 @@ const WIDE = {
   look: new THREE.Vector3(-0.2, 1.5, -0.2),
 };
 const ZOOM_MS = 1600;
-const LAMP_ON = { spot: 5, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
+const LAMP_ON = { spot: 3, bulb: 3.2, hemi: 0.55, bounce: 0.9 };
 const LAMP_OFF = { spot: 0, bulb: 0.15, hemi: 0.1, bounce: 0 };
 const REFUSAL_MAX = { light: 1.1, glow: 3.2, halo: 0.75 }; // at 100% on the dimmer (light is per globe)
 // The Refusal's rods are 2 m, 1.25 m and 0.75 m long; the room shows them at this scale.
@@ -141,7 +141,6 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const mat = {
     wood: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 }),
     darkWood: new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.6 }),
-    wall: new THREE.MeshStandardMaterial({ color: 0x6c6e55, roughness: 0.92 }), // olive green, as in the studio (left wall)
     // Sage green chosen by the studio (#9aaa83). The base is slightly cooler so that,
     // under the warm lamps, the wall renders as #9aaa83 on screen.
     sageWall: new THREE.MeshStandardMaterial({ color: 0x96b393, roughness: 0.92, emissive: 0x96b393, emissiveIntensity: 0.14 }),
@@ -151,9 +150,6 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     plastic: new THREE.MeshStandardMaterial({ color: 0x1c1c1e, roughness: 0.45 }),
     keys: new THREE.MeshStandardMaterial({ color: 0x3a3936, roughness: 0.6 }),
     pad: new THREE.MeshStandardMaterial({ color: 0x2b2622, roughness: 0.95 }),
-    brass: new THREE.MeshStandardMaterial({ color: 0xc19a5b, roughness: 0.28, metalness: 0.9, envMap, envMapIntensity: 0.55 }),
-    greenGlass: new THREE.MeshStandardMaterial({ color: 0x1fa33c, roughness: 0.1, metalness: 0, envMap, envMapIntensity: 0.9, emissive: 0x13802c, emissiveIntensity: 0 }),
-    shadeInner: new THREE.MeshStandardMaterial({ color: 0xfff4e0, roughness: 0.5, side: THREE.BackSide, emissive: 0xffd8a0, emissiveIntensity: 0 }),
     terracotta: new THREE.MeshStandardMaterial({ color: 0xb5603a, roughness: 0.7 }),
     glaze: new THREE.MeshStandardMaterial({ color: 0x9db0a0, roughness: 0.3 }),
     red: new THREE.MeshStandardMaterial({ color: 0xe6502f, roughness: 0.5 }),
@@ -176,7 +172,7 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
 
   // The left wall meets the back wall in the corner The Refusal is mounted in.
   const CORNER = { x: -1.6, z: -0.72 };
-  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wall), CORNER.x, 2.5, 0, { cast: false });
+  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.sageWall), CORNER.x, 2.5, 0, { cast: false });
   side.rotation.y = Math.PI / 2;
   room.add(side);
 
@@ -401,56 +397,60 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     normal: new THREE.Vector3(0, 0, 1).applyQuaternion(photoFrame.quaternion),
   };
 
-  // ---- desk lamp: a banker's lamp with a green glass shade -----------------
+  // ---- desk lamp: three soft glowing tiers on four curved wooden legs -------
   const lamp = new THREE.Group();
   lamp.userData.action = 'lamp';
-  lamp.position.set(-0.62, 0.76, -0.04);
-  lamp.rotation.y = 0.66; // the long side of the shade faces the camera
-  lamp.scale.setScalar(1.2);
+  lamp.position.set(-0.6, 0.76, -0.04);
   room.add(lamp);
-  lamp.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.095, 0.018, 48), mat.brass), 0, 0.009, -0.01));
-  lamp.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.07, 0.02, 40), mat.brass), 0, 0.028, -0.03));
-  const footProfile = [[0, 0], [0.03, 0], [0.035, 0.02], [0.022, 0.045], [0.018, 0.07], [0.026, 0.085], [0, 0.085]]
-    .map(([x, y]) => new THREE.Vector2(x, y));
-  lamp.add(place(new THREE.Mesh(new THREE.LatheGeometry(footProfile, 32), mat.brass), 0, 0.038, -0.04));
-  const stemCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 0.12, -0.04),
-    new THREE.Vector3(0, 0.24, -0.046),
-    new THREE.Vector3(0, 0.33, -0.02),
-    new THREE.Vector3(0, 0.392, -0.012),
-  ]);
-  const stem = new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 32, 0.008, 12), mat.brass);
-  stem.castShadow = true;
-  lamp.add(stem);
-
-  // Shade: an elongated glass dome, green outside, warm white inside.
-  const SHADE = { r: 0.07, len: 0.3, y: 0.345, z: 0.045 };
-  const domeGeo = new THREE.SphereGeometry(1, 48, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-  for (const material of [mat.greenGlass, mat.shadeInner]) {
-    const dome = new THREE.Mesh(domeGeo, material);
-    dome.scale.set(SHADE.len / 2, SHADE.r, 0.085);
-    dome.position.set(0, SHADE.y, SHADE.z);
-    dome.castShadow = material === mat.greenGlass;
-    lamp.add(dome);
+  const LEG_H = 0.12; // the shade's lowest tier sits this high above the desk
+  const TIER = { r: 0.105, h: 0.075, waist: 0.74 };
+  // Shade: one lathe profile with three rounded bulges stacked on top of each other.
+  const shadeProfile = [new THREE.Vector2(0, 0)];
+  for (let t = 0; t < 3; t++) {
+    for (let i = 0; i <= 16; i++) {
+      const a = (i / 16) * Math.PI;
+      shadeProfile.push(new THREE.Vector2(
+        TIER.r * (TIER.waist + (1 - TIER.waist) * Math.sin(a)),
+        t * TIER.h + ((1 - Math.cos(a)) / 2) * TIER.h,
+      ));
+    }
   }
-  // Brass rim around the lower edge of the shade.
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 8, 64), mat.brass);
-  rim.rotation.x = Math.PI / 2;
-  rim.scale.set(SHADE.len / 2, 0.085, 0.12);
-  rim.position.set(0, SHADE.y, SHADE.z);
-  lamp.add(rim);
-  lamp.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.012, 16, 12), mat.brass), 0, SHADE.y + SHADE.r, SHADE.z));
-  const bulb = place(new THREE.Mesh(new THREE.SphereGeometry(0.018, 16, 12), mat.bulb), 0, SHADE.y - 0.01, SHADE.z, { cast: false });
+  shadeProfile.push(new THREE.Vector2(0, 3 * TIER.h));
+  const shadeMat = new THREE.MeshStandardMaterial({ color: 0xefb78a, roughness: 0.7, emissive: 0xff9c55, emissiveIntensity: 0 });
+  const shade = place(new THREE.Mesh(new THREE.LatheGeometry(shadeProfile, 64), shadeMat), 0, LEG_H, 0, { cast: false });
+  lamp.add(shade);
+  // Four hourglass-shaped wooden legs, splayed slightly at the foot, holding the lowest tier.
+  const wood = new THREE.MeshStandardMaterial({ color: 0x5a3524, roughness: 0.5 });
+  const legProfile = [[0, 0], [0.016, 0], [0.016, 0.01], [0.009, 0.06], [0.0085, 0.1], [0.013, 0.17], [0.014, 0.19], [0, 0.19]]
+    .map(([x, y]) => new THREE.Vector2(x, y));
+  const legGeo = new THREE.LatheGeometry(legProfile, 20);
+  for (let i = 0; i < 4; i++) {
+    const holder = new THREE.Group();
+    holder.rotation.y = Math.PI / 4 + (i * Math.PI) / 2;
+    const leg = place(new THREE.Mesh(legGeo, wood), 0.088, 0, 0);
+    leg.rotation.z = 0.07; // feet splay outward
+    holder.add(leg);
+    lamp.add(holder);
+  }
+  // Warm bulb hidden inside the shade.
+  const bulb = place(new THREE.Mesh(new THREE.SphereGeometry(0.025, 16, 12), mat.bulb), 0, LEG_H + 0.11, 0, { cast: false });
   lamp.add(bulb);
-  // Pull chain with a bead.
-  lamp.add(place(new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.09, 6), mat.brass), 0.1, SHADE.y - 0.045, SHADE.z + 0.05, { cast: false }));
-  lamp.add(place(new THREE.Mesh(new THREE.SphereGeometry(0.006, 12, 8), mat.brass), 0.1, SHADE.y - 0.092, SHADE.z + 0.05, { cast: false }));
+  // Black cable from under the shade across the desk to the back.
+  const deskCable = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, LEG_H, 0),
+    new THREE.Vector3(0.01, LEG_H - 0.05, 0.005),
+    new THREE.Vector3(0.04, 0.004, 0.02),
+    new THREE.Vector3(0.14, 0.003, -0.06),
+    new THREE.Vector3(0.2, 0.003, -0.3),
+  ]);
+  lamp.add(new THREE.Mesh(new THREE.TubeGeometry(deskCable, 60, 0.003, 6, false), mat.plastic));
   lamp.updateMatrixWorld(true);
 
-  const lampLight = new THREE.SpotLight(0xffe4c4, 0, 2.5, Math.PI / 2.3, 0.8, 1.6);
-  lampLight.position.copy(lamp.localToWorld(new THREE.Vector3(0, SHADE.y - 0.02, SHADE.z + 0.01)));
+  // A downward light (with shadows of the legs) and a glow all around.
+  const lampLight = new THREE.SpotLight(0xffd9b0, 0, 2.5, Math.PI / 2.2, 0.9, 1.6);
+  lampLight.position.copy(lamp.localToWorld(new THREE.Vector3(0, LEG_H + 0.02, 0)));
   const lampTarget = new THREE.Object3D();
-  lampTarget.position.copy(lamp.localToWorld(new THREE.Vector3(0, -SHADE.y, SHADE.z + 0.14)));
+  lampTarget.position.copy(lamp.localToWorld(new THREE.Vector3(0, -LEG_H, 0.05)));
   room.add(lampTarget);
   lampLight.target = lampTarget;
   lampLight.castShadow = true;
@@ -460,6 +460,9 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   lampLight.shadow.camera.near = 0.02;
   lampLight.shadow.camera.far = 3;
   room.add(lampLight);
+  const lampGlow = new THREE.PointLight(0xffc690, 0, 2.2, 1.7);
+  lampGlow.position.copy(lamp.localToWorld(new THREE.Vector3(0, LEG_H + 0.13, 0)));
+  room.add(lampGlow);
 
   // Soft warm bounce from the lamp, so the wall and the logo read when it is on.
   const bounce = new THREE.PointLight(0xffdcb8, 0, 4, 1.6);
@@ -785,8 +788,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
     state.lampLevel += (target - state.lampLevel) * (1 - Math.exp(-dt * 7));
     const L = state.lampLevel;
     lampLight.intensity = LAMP_OFF.spot + (LAMP_ON.spot - LAMP_OFF.spot) * L;
-    mat.shadeInner.emissiveIntensity = 0.7 * L;
-    mat.greenGlass.emissiveIntensity = 0.05 * L;
+    shadeMat.emissiveIntensity = 0.04 + 0.7 * L;
+    lampGlow.intensity = 0.9 * L;
     mat.bulb.color.setRGB(0.25 + 0.75 * L, 0.2 + 0.6 * L, 0.1 + 0.3 * L);
     hemi.intensity = LAMP_OFF.hemi + (LAMP_ON.hemi - LAMP_OFF.hemi) * L;
     bounce.intensity = LAMP_ON.bounce * L;
