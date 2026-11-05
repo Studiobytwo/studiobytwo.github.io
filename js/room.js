@@ -141,9 +141,8 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   const mat = {
     wood: new THREE.MeshStandardMaterial({ map: woodTex, roughness: 0.55 }),
     darkWood: new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.6 }),
-    // Sage green chosen by the studio (#9aaa83). The base is slightly cooler so that,
-    // under the warm lamps, the wall renders as #9aaa83 on screen.
-    sageWall: new THREE.MeshStandardMaterial({ color: 0x96b393, roughness: 0.92, emissive: 0x96b393, emissiveIntensity: 0.14 }),
+    // Burgundy walls (target about #800020 on screen under the warm lamps).
+    wallPaint: new THREE.MeshStandardMaterial({ color: 0x4a0f1e, roughness: 0.9, emissive: 0x4a0f1e, emissiveIntensity: 0.06 }),
     floor: new THREE.MeshStandardMaterial({ color: 0x252019, roughness: 0.9 }),
     beige: new THREE.MeshStandardMaterial({ color: 0xcfc5b0, roughness: 0.55 }),
     bezel: new THREE.MeshStandardMaterial({ color: 0x141414, roughness: 0.4 }),
@@ -167,12 +166,12 @@ export function createRoom({ canvasHost, cssHost, screenEl, onZoomChange, onLamp
   floor.rotation.x = -Math.PI / 2;
   room.add(floor);
 
-  const back = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.sageWall), 0, 2.5, -0.72, { cast: false });
+  const back = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wallPaint), 0, 2.5, -0.72, { cast: false });
   room.add(back);
 
   // The left wall meets the back wall in the corner The Refusal is mounted in.
   const CORNER = { x: -1.6, z: -0.72 };
-  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.sageWall), CORNER.x, 2.5, 0, { cast: false });
+  const side = place(new THREE.Mesh(new THREE.PlaneGeometry(10, 5), mat.wallPaint), CORNER.x, 2.5, 0, { cast: false });
   side.rotation.y = Math.PI / 2;
   room.add(side);
 
